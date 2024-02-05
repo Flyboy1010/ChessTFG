@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://diioigr62k7wp"]
+
+[ext_resource type="Shader" path="res://Shaders/BoardSquares.gdshader" id="1_1khy4"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_b1cto"]
+shader = ExtResource("1_1khy4")
+shader_parameter/u_colorWhite = Color(0.941176, 0.941176, 0.941176, 1)
+shader_parameter/u_colorBlack = Color(0.529412, 0.470588, 0.721569, 1)
+
+[node name="ChessGame" type="Node2D"]
+
+[node name="BoardGraphics" type="Node2D" parent="."]
+position = Vector2(540, 120)
+
+[node name="BoardSquares" type="ColorRect" parent="BoardGraphics"]
+material = SubResource("ShaderMaterial_b1cto")
+offset_right = 840.0
+offset_bottom = 840.0
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(960, 540)

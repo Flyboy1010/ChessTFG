@@ -1,6 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://diioigr62k7wp"]
+[gd_scene load_steps=6 format=3 uid="uid://diioigr62k7wp"]
 
 [ext_resource type="Shader" path="res://Shaders/BoardSquares.gdshader" id="1_1khy4"]
+[ext_resource type="Script" path="res://Scripts/ChessGame.cs" id="1_1pmha"]
+[ext_resource type="Script" path="res://Scripts/BoardGraphics.cs" id="2_f4nbj"]
+[ext_resource type="Texture2D" uid="uid://d1w0vck3rhrlq" path="res://Assets/Sprites/pieces.png" id="3_qps3y"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b1cto"]
 shader = ExtResource("1_1khy4")
@@ -8,9 +11,13 @@ shader_parameter/u_colorWhite = Color(0.941176, 0.941176, 0.941176, 1)
 shader_parameter/u_colorBlack = Color(0.529412, 0.470588, 0.721569, 1)
 
 [node name="ChessGame" type="Node2D"]
+script = ExtResource("1_1pmha")
 
 [node name="BoardGraphics" type="Node2D" parent="."]
 position = Vector2(540, 120)
+script = ExtResource("2_f4nbj")
+piecesTexture = ExtResource("3_qps3y")
+squareSize = 105
 
 [node name="BoardSquares" type="ColorRect" parent="BoardGraphics"]
 material = SubResource("ShaderMaterial_b1cto")

@@ -37,6 +37,6 @@ public partial class ChessGame : Node2D
 
     public override void _Process(double delta)
 	{
-
+		
 	}
 }

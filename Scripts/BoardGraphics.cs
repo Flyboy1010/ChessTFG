@@ -32,6 +32,10 @@ public partial class BoardGraphics : Node2D
 
     private Vector2I pieceTextureSize;
 
+    // selected piece index
+
+    private int pieceSelectedIndex = 0;
+
 	// Called when the node enters the scene tree for the first time.
 
 	public override void _Ready()
@@ -51,6 +55,13 @@ public partial class BoardGraphics : Node2D
 	{
 		this.board = board;
 	}
+
+    // get piece sprite
+
+    public Sprite2D GetPieceSprite(int index)
+    {
+        return piecesSprites[index];
+    }
 
     // create the graphics
 
@@ -122,10 +133,97 @@ public partial class BoardGraphics : Node2D
         }
     }
 
+    // select piece
+
+    public void SelectPiece(int index)
+    {
+        pieceSelectedIndex = index;
+    }
+
+    // update selected piece
+
+    public void UpdateSelectedPiece()
+    {
+        // get the mouse coordinates
+
+        Vector2 mouse = GetLocalMousePosition();
+
+        // get the piece sprite & update its position and zindex
+
+        Sprite2D pieceSelected = piecesSprites[pieceSelectedIndex];
+        pieceSelected.ZIndex = (int)SpriteZIndex.PieceSelected;
+        pieceSelected.Position = mouse;
+    }
+
+    // get square index at x, y world coordinates
+
+    public bool TryGetSquareIndexFromCoords(Vector2 coords, out int squareIndex)
+    {
+        Vector2I square = (Vector2I)(coords / squareSize).Floor();
+
+        squareIndex = square.X + square.Y * 8;
+
+        if (isBoardFlipped)
+        {
+            squareIndex = 63 - squareIndex;
+        }
+
+        return (square.X >= 0 && square.X < 8 && square.Y >= 0 && square.Y < 8);
+    }
+
     // Called every frame. 'delta' is the elapsed time since the previous frame.
 
     public override void _Process(double delta)
 	{
+        // get the mouse coordinates
 
-	}
+        Vector2 mouse = GetLocalMousePosition();
+
+        // get the square the mouse is on
+
+        bool isOnSquare = TryGetSquareIndexFromCoords(mouse, out int squareIndex);
+
+        // the first frame you click
+
+        if (Input.IsActionJustPressed("Select"))
+        {
+            if (isOnSquare)
+            {
+                // select a piece
+
+                SelectPiece(squareIndex);
+            }
+        }
+
+        // if you hold
+
+        if (Input.IsActionPressed("Select"))
+        {
+            // update the selected piece
+
+            UpdateSelectedPiece();
+        }
+
+        // the frame you release
+
+        if (Input.IsActionJustReleased("Select"))
+        {
+            if (isOnSquare)
+            {
+                // make the move
+
+                Move move = new Move()
+                {
+                    squareSourceIndex = pieceSelectedIndex,
+                    squareTargetIndex = squareIndex
+                };
+
+                board.MakeMove(move);
+            }
+
+            // update the graphics
+
+            UpdateGraphics();
+        }
+    }
 }

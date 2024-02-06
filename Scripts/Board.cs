@@ -80,4 +80,13 @@ public class Board
             }
         }
     }
+
+    // make move
+
+    public void MakeMove(Move move)
+    {
+        Piece pieceSource = pieces[move.squareSourceIndex];
+        pieces[move.squareSourceIndex] = new Piece() { type = Piece.Type.None };
+        pieces[move.squareTargetIndex] = pieceSource;
+    }
 }

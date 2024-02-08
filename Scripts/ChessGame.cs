@@ -11,6 +11,11 @@ public partial class ChessGame : Node2D
 
 	private BoardGraphics boardGraphics;
 
+    // selected piece index
+
+    private bool isPieceSelected = false;
+    private int pieceSelectedIndex = -1; // -1 means nothing selected
+
 	// Called when the node enters the scene tree for the first time.
 
 	public override void _Ready()
@@ -37,6 +42,74 @@ public partial class ChessGame : Node2D
 
     public override void _Process(double delta)
 	{
-		
-	}
+        // get the mouse coordinates
+
+        Vector2 mouse = boardGraphics.GetLocalMousePosition();
+
+        // get the square the mouse is on
+
+        bool isOnSquare = boardGraphics.TryGetSquareIndexFromCoords(mouse, out int squareIndex);
+
+        // the first frame you click
+
+        if (Input.IsActionJustPressed("Select"))
+        {
+            if (isOnSquare)
+            {
+                // get the piece
+
+                Piece piece = board.GetPiece(squareIndex);
+
+                // if not none then select it
+
+                if (piece.type != Piece.Type.None)
+                {
+                    isPieceSelected = true;
+                    pieceSelectedIndex = squareIndex;
+                }
+            }
+        }
+
+        // if you hold
+
+        if (Input.IsActionPressed("Select"))
+        {
+            if (isPieceSelected)
+            {
+                // update the selected piece
+
+                boardGraphics.SetPieceSpritePosition(pieceSelectedIndex, mouse);
+            }
+        }
+
+        // the frame you release
+
+        if (Input.IsActionJustReleased("Select"))
+        {
+            if (isOnSquare)
+            {
+                if (isPieceSelected)
+                {
+                    // make the move
+
+                    Move move = new Move()
+                    {
+                        squareSourceIndex = pieceSelectedIndex,
+                        squareTargetIndex = squareIndex
+                    };
+
+                    board.MakeMove(move);
+
+                    // deselect the piece
+
+                    isPieceSelected = false;
+                    pieceSelectedIndex = -1;
+                }
+            }
+
+            // update graphics
+
+            boardGraphics.UpdateGraphics();
+        }
+    }
 }

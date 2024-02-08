@@ -32,10 +32,6 @@ public partial class BoardGraphics : Node2D
 
     private Vector2I pieceTextureSize;
 
-    // selected piece index
-
-    private int pieceSelectedIndex = 0;
-
 	// Called when the node enters the scene tree for the first time.
 
 	public override void _Ready()
@@ -61,6 +57,39 @@ public partial class BoardGraphics : Node2D
     public Sprite2D GetPieceSprite(int index)
     {
         return piecesSprites[index];
+    }
+
+    // set sprite piece
+
+    private void SetPieceSprite(Sprite2D pieceSprite, Piece piece)
+    {
+        if (piece.type == Piece.Type.None)
+        {
+            pieceSprite.Visible = false;
+        }
+        else
+        {
+            // set the region the piece is inside the pieces texture
+
+            pieceSprite.RegionRect = new Rect2(pieceTextureSize.X * ((int)piece.type - 1), pieceTextureSize.Y * ((int)piece.color - 1), pieceTextureSize.X, pieceTextureSize.Y);
+            pieceSprite.Visible = true;
+        }
+    }
+
+    // get square index at x, y world coordinates
+
+    public bool TryGetSquareIndexFromCoords(Vector2 coords, out int squareIndex)
+    {
+        Vector2I square = (Vector2I)(coords / squareSize).Floor();
+
+        squareIndex = square.X + square.Y * 8;
+
+        if (isBoardFlipped)
+        {
+            squareIndex = 63 - squareIndex;
+        }
+
+        return (square.X >= 0 && square.X < 8 && square.Y >= 0 && square.Y < 8);
     }
 
     // create the graphics
@@ -107,7 +136,7 @@ public partial class BoardGraphics : Node2D
                 pieceSprite.ZIndex = (int)SpriteZIndex.PieceDeselected;
                 Piece piece = board.GetPiece(index);
 
-                SetSpritePiece(pieceSprite, piece);
+                SetPieceSprite(pieceSprite, piece);
 
                 Vector2 pieceSpritePosition = isBoardFlipped ? new Vector2((7 - i) + 0.5f, (7 - j) + 0.5f) : new Vector2(i + 0.5f, j + 0.5f);
 
@@ -116,114 +145,21 @@ public partial class BoardGraphics : Node2D
         }
     }
 
-    // set sprite piece
-
-    private void SetSpritePiece(Sprite2D pieceSprite, Piece piece)
-    {
-        if (piece.type == Piece.Type.None)
-        {
-            pieceSprite.Visible = false;
-        }
-        else
-        {
-            // set the region the piece is inside the pieces texture
-
-            pieceSprite.RegionRect = new Rect2(pieceTextureSize.X * ((int)piece.type - 1), pieceTextureSize.Y * ((int)piece.color - 1), pieceTextureSize.X, pieceTextureSize.Y);
-            pieceSprite.Visible = true;
-        }
-    }
-
-    // select piece
-
-    public void SelectPiece(int index)
-    {
-        pieceSelectedIndex = index;
-    }
-
     // update selected piece
 
-    public void UpdateSelectedPiece()
+    public void SetPieceSpritePosition(int index, Vector2 position)
     {
-        // get the mouse coordinates
-
-        Vector2 mouse = GetLocalMousePosition();
-
         // get the piece sprite & update its position and zindex
 
-        Sprite2D pieceSelected = piecesSprites[pieceSelectedIndex];
-        pieceSelected.ZIndex = (int)SpriteZIndex.PieceSelected;
-        pieceSelected.Position = mouse;
-    }
-
-    // get square index at x, y world coordinates
-
-    public bool TryGetSquareIndexFromCoords(Vector2 coords, out int squareIndex)
-    {
-        Vector2I square = (Vector2I)(coords / squareSize).Floor();
-
-        squareIndex = square.X + square.Y * 8;
-
-        if (isBoardFlipped)
-        {
-            squareIndex = 63 - squareIndex;
-        }
-
-        return (square.X >= 0 && square.X < 8 && square.Y >= 0 && square.Y < 8);
+        Sprite2D pieceSprite = piecesSprites[index];
+        pieceSprite.ZIndex = (int)SpriteZIndex.PieceSelected;
+        pieceSprite.Position = position;
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
 
     public override void _Process(double delta)
 	{
-        // get the mouse coordinates
-
-        Vector2 mouse = GetLocalMousePosition();
-
-        // get the square the mouse is on
-
-        bool isOnSquare = TryGetSquareIndexFromCoords(mouse, out int squareIndex);
-
-        // the first frame you click
-
-        if (Input.IsActionJustPressed("Select"))
-        {
-            if (isOnSquare)
-            {
-                // select a piece
-
-                SelectPiece(squareIndex);
-            }
-        }
-
-        // if you hold
-
-        if (Input.IsActionPressed("Select"))
-        {
-            // update the selected piece
-
-            UpdateSelectedPiece();
-        }
-
-        // the frame you release
-
-        if (Input.IsActionJustReleased("Select"))
-        {
-            if (isOnSquare)
-            {
-                // make the move
-
-                Move move = new Move()
-                {
-                    squareSourceIndex = pieceSelectedIndex,
-                    squareTargetIndex = squareIndex
-                };
-
-                board.MakeMove(move);
-            }
-
-            // update the graphics
-
-            UpdateGraphics();
-        }
+        
     }
 }

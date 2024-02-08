@@ -68,6 +68,11 @@ public partial class ChessGame : Node2D
                     pieceSelectedIndex = squareIndex;
                 }
             }
+            else
+            {
+                isPieceSelected = false;
+                pieceSelectedIndex = -1;
+            }
         }
 
         // if you hold
@@ -86,9 +91,9 @@ public partial class ChessGame : Node2D
 
         if (Input.IsActionJustReleased("Select"))
         {
-            if (isOnSquare)
+            if (isPieceSelected)
             {
-                if (isPieceSelected)
+                if (isOnSquare)
                 {
                     // make the move
 
@@ -99,12 +104,12 @@ public partial class ChessGame : Node2D
                     };
 
                     board.MakeMove(move);
-
-                    // deselect the piece
-
-                    isPieceSelected = false;
-                    pieceSelectedIndex = -1;
                 }
+
+                // deselect the piece
+
+                isPieceSelected = false;
+                pieceSelectedIndex = -1;
             }
 
             // update graphics

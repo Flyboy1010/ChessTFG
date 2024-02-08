@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class ChessGame : Node2D
 {
@@ -15,6 +16,7 @@ public partial class ChessGame : Node2D
 
     private bool isPieceSelected = false;
     private int pieceSelectedIndex = -1; // -1 means nothing selected
+    private List<Move> pieceSelectedMoves = null;
 
 	// Called when the node enters the scene tree for the first time.
 
@@ -66,6 +68,7 @@ public partial class ChessGame : Node2D
                 {
                     isPieceSelected = true;
                     pieceSelectedIndex = squareIndex;
+                    pieceSelectedMoves = MoveGeneration.GetPseudoLegalMoves(board, squareIndex);
                 }
             }
             else
@@ -95,15 +98,27 @@ public partial class ChessGame : Node2D
             {
                 if (isOnSquare)
                 {
-                    // make the move
+                    // check if the square is a valid move
 
-                    Move move = new Move()
+                    foreach (Move move in pieceSelectedMoves)
                     {
-                        squareSourceIndex = pieceSelectedIndex,
-                        squareTargetIndex = squareIndex
-                    };
+                        // if the move is found
 
-                    board.MakeMove(move);
+                        if (move.squareTargetIndex == squareIndex)
+                        {
+                            // deselect the piece
+
+                            isPieceSelected = false;
+                            pieceSelectedIndex = -1;
+                            pieceSelectedMoves = null;
+
+                            // make the move
+
+                            board.MakeMove(move);
+
+                            break;
+                        }
+                    }
                 }
 
                 // deselect the piece

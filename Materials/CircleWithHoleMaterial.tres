@@ -4,6 +4,6 @@
 
 [resource]
 shader = ExtResource("1_mi1w0")
-shader_parameter/color = Color(0, 0, 0, 0.196078)
+shader_parameter/color = Color(0, 0, 0, 0.3)
 shader_parameter/thickness = 0.2
 shader_parameter/radius = 1.0

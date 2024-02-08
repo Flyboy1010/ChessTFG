@@ -80,7 +80,7 @@ public struct BoardState
         doublePushedPawnColor = color;
     }
 
-    public Piece.Color GetEnPassantColor(Piece.Color color)
+    public Piece.Color GetEnPassantColor()
     {
         return doublePushedPawnColor;
     }

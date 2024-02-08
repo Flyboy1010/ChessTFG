@@ -27,6 +27,8 @@ public static class MoveGeneration
 
     private static readonly int[][] preCalculatedSquaresToEdge = new int[64][];
     private static readonly int[][] preCalculatedKnightMoves = new int[64][];
+    private static readonly int[][] preCalculatedKingMoves = new int[64][];
+    private static readonly int[][][] preCalculatedPawnCapturesMoves = new int[2][][];
 
     // static ctor
 
@@ -48,6 +50,11 @@ public static class MoveGeneration
 
     public static void PrecalculateMoves()
     {
+        // init arrays pawn captures
+
+        preCalculatedPawnCapturesMoves[0] = new int[64][]; // white
+        preCalculatedPawnCapturesMoves[1] = new int[64][]; // black
+
         // helper buffer
 
         List<int> movesBuffer = new List<int>();
@@ -95,6 +102,63 @@ public static class MoveGeneration
                 }
 
                 preCalculatedKnightMoves[index] = movesBuffer.ToArray();
+
+                // king moves
+
+                movesBuffer.Clear();
+
+                for (int jj = -1; jj <= 1; jj++)
+                {
+                    for (int ii = -1; ii <= 1; ii++)
+                    {
+                        if (!(ii == 0 && jj == 0) && IsInBounds(i + ii, j + jj))
+                        {
+                            movesBuffer.Add((i + ii) + (j + jj) * 8);
+                        }
+                    }
+                }
+
+                preCalculatedKingMoves[index] = movesBuffer.ToArray();
+
+                /* PAWN CAPTURES */
+
+                // white pawns
+
+                movesBuffer.Clear();
+
+                if (j > 0)
+                {
+                    if (i > 0)
+                    {
+                        movesBuffer.Add(index + directionOffsets[(int)Direction.D2]);
+                    }
+
+                    if (i < 7)
+                    {
+                        movesBuffer.Add(index + directionOffsets[(int)Direction.D1]);
+                    }
+                }
+
+                preCalculatedPawnCapturesMoves[0][index] = movesBuffer.ToArray();
+
+                // black pawns
+
+                movesBuffer.Clear();
+
+                if (j < 7)
+                {
+                    if (i > 0)
+                    {
+                        movesBuffer.Add(index + directionOffsets[(int)Direction.D3]);
+                    }
+
+                    if (i < 7)
+                    {
+                        movesBuffer.Add(index + directionOffsets[(int)Direction.D4]);
+                    }
+                }
+
+                preCalculatedPawnCapturesMoves[1][index] = movesBuffer.ToArray();
             }
         }
     }
@@ -128,6 +192,56 @@ public static class MoveGeneration
         return moves;
     }
 
+    // generate sliding moves (for bishop rook & queen)
+
+    private static List<Move> GenerateSlidingMoves(Board board, int index)
+    {
+        List<Move> moves = new List<Move>();
+
+        Piece piece = board.GetPiece(index);
+
+        int startDirection = (piece.type != Piece.Type.Bishop) ? 0 : 4;
+        int endDirection = (piece.type != Piece.Type.Rook) ? 8 : 4;
+
+        for (int d = startDirection; d < endDirection; d++)
+        {
+            int n = preCalculatedSquaresToEdge[index][d];
+
+            for (int i = 0; i < n; i++)
+            {
+                int targetIndex = index + directionOffsets[d] * (i + 1);
+
+                Piece targetPiece = board.GetPiece(targetIndex);
+
+                // construct move
+
+                Move move = new Move();
+                move.squareSourceIndex = index;
+                move.squareTargetIndex = targetIndex;
+                move.pieceSource = piece;
+                move.pieceTarget = targetPiece;
+
+                // check pieces in the path
+
+                if (targetPiece.type == Piece.Type.None)
+                {
+                    moves.Add(move);
+                }
+                else
+                {
+                    if (targetPiece.color != piece.color)
+                    {
+                        moves.Add(move);
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        return moves;
+    }
+
     // generate pseudo legal moves
 
     public static List<Move> GetPseudoLegalMoves(Board board, int index)
@@ -138,6 +252,10 @@ public static class MoveGeneration
         {
             case Piece.Type.Knight:
                 return GenerateKnightMoves(board, index);
+            case Piece.Type.Bishop:
+            case Piece.Type.Queen:
+            case Piece.Type.Rook:
+                return GenerateSlidingMoves(board, index);
         }
 
         return new List<Move>();

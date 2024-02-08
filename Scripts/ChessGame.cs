@@ -66,15 +66,16 @@ public partial class ChessGame : Node2D
 
                 if (piece.type != Piece.Type.None)
                 {
+                    // select piece
+
                     isPieceSelected = true;
                     pieceSelectedIndex = squareIndex;
                     pieceSelectedMoves = MoveGeneration.GetPseudoLegalMoves(board, squareIndex);
+
+                    // set hint moves
+
+                    boardGraphics.SetHintMoves(pieceSelectedMoves);
                 }
-            }
-            else
-            {
-                isPieceSelected = false;
-                pieceSelectedIndex = -1;
             }
         }
 
@@ -106,12 +107,6 @@ public partial class ChessGame : Node2D
 
                         if (move.squareTargetIndex == squareIndex)
                         {
-                            // deselect the piece
-
-                            isPieceSelected = false;
-                            pieceSelectedIndex = -1;
-                            pieceSelectedMoves = null;
-
                             // make the move
 
                             board.MakeMove(move);
@@ -120,12 +115,17 @@ public partial class ChessGame : Node2D
                         }
                     }
                 }
-
-                // deselect the piece
-
-                isPieceSelected = false;
-                pieceSelectedIndex = -1;
             }
+
+            // deselect the piece
+
+            isPieceSelected = false;
+            pieceSelectedIndex = -1;
+            pieceSelectedMoves = null;
+
+            // clear hint moves
+
+            boardGraphics.SetHintMoves(null);
 
             // update graphics
 

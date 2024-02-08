@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class BoardGraphics : Node2D
 {
@@ -13,8 +14,10 @@ public partial class BoardGraphics : Node2D
 
 	// texture with the pieces
 
-	[Export] private Texture2D piecesTexture;
 	[Export] private int squareSize;
+	[Export] private Texture2D piecesTexture;
+    [Export] private Material hintCircleMaterial;
+    [Export] private Material hintCircleWithHoleMaterial;
 
 	// board 
 
@@ -23,6 +26,10 @@ public partial class BoardGraphics : Node2D
 	// array with the sprites representing the pieces
 
 	private Sprite2D[] piecesSprites = new Sprite2D[64];
+
+    // array with the "sprites"(color rects) that represent the hints for the moves
+
+    private ColorRect[] hintsSprites = new ColorRect[64];
 
     // board flipped flag
 
@@ -100,6 +107,22 @@ public partial class BoardGraphics : Node2D
 
         Vector2 pieceScale = new Vector2(squareSize, squareSize) / (Vector2)pieceTextureSize;
 
+        // create hints sprites
+
+        for (int j = 0; j < 8; j++)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                ColorRect hintSprite = new ColorRect();
+                hintSprite.Size = new Vector2(squareSize, squareSize);
+                hintSprite.Position = new Vector2(i, j) * squareSize;
+                hintSprite.Visible = false;
+
+                hintsSprites[i + j * 8] = hintSprite;
+                AddChild(hintSprite);
+            }
+        }
+
         // create pieces sprites
 
         for (int j = 0; j < 8; j++)
@@ -141,6 +164,12 @@ public partial class BoardGraphics : Node2D
                 Vector2 pieceSpritePosition = isBoardFlipped ? new Vector2((7 - i) + 0.5f, (7 - j) + 0.5f) : new Vector2(i + 0.5f, j + 0.5f);
 
                 pieceSprite.Position = pieceSpritePosition * squareSize;
+
+                // hint moves sprites
+
+                ColorRect hintSprite = hintsSprites[index];
+                Vector2 hintSpritePosition = isBoardFlipped ? new Vector2(7 - i, 7 - j) : new Vector2(i, j);
+                hintSprite.Position = hintSpritePosition * squareSize;
             }
         }
     }
@@ -154,6 +183,31 @@ public partial class BoardGraphics : Node2D
         Sprite2D pieceSprite = piecesSprites[index];
         pieceSprite.ZIndex = (int)SpriteZIndex.PieceSelected;
         pieceSprite.Position = position;
+    }
+
+    // set hint moves
+
+    public void SetHintMoves(List<Move> moves)
+    {
+        // hide previous hint moves
+
+        for (int i = 0; i < 64; i++)
+        {
+            hintsSprites[i].Visible = false;
+        }
+
+        // show the new ones if not null
+
+        if (moves != null)
+        {
+            foreach (Move move in moves)
+            {
+                Material m = move.pieceTarget.type == Piece.Type.None ? hintCircleMaterial : hintCircleWithHoleMaterial;
+
+                hintsSprites[move.squareTargetIndex].Material = m;
+                hintsSprites[move.squareTargetIndex].Visible = true;
+            }
+        }
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

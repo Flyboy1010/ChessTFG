@@ -46,6 +46,13 @@ public class Board
         return pieces[index];
     }
 
+    // get turn color
+
+    public Piece.Color GetTurnColor()
+    {
+        return currentBoardState.GetTurnColor();
+    }
+
     // get current board state
 
     public ref readonly BoardState GetBoardState()
@@ -199,8 +206,6 @@ public class Board
 
                 currentBoardState.SetEnPassant(false);
 
-                //currentState.doublePushedPawnColor = Piece.Color.None;
-
                 pieces[move.squareTargetIndex] = new Piece { type = move.promotionPieceType, color = move.pieceSource.color };
                 break;
             case Move.Flags.EnPassant:
@@ -215,6 +220,10 @@ public class Board
 
                 break;
             default:
+                // disable en passant
+
+                currentBoardState.SetEnPassant(false);
+
                 // move the piece to the target
 
                 pieces[move.squareTargetIndex] = move.pieceSource;
@@ -224,6 +233,11 @@ public class Board
         // push the move onto the stack
 
         moves.Push(move);
+
+        // change turn color
+
+        Piece.Color turnColor = currentBoardState.GetTurnColor();
+        currentBoardState.SetTurnColor(turnColor == Piece.Color.White ? Piece.Color.Black : Piece.Color.White);
     }
 
     // undoes the last move

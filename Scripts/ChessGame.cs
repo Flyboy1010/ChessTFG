@@ -44,6 +44,10 @@ public partial class ChessGame : Node2D
 
     public override void _Process(double delta)
 	{
+        // get turn color
+
+        Piece.Color turnColor = board.GetTurnColor();
+
         // get the mouse coordinates
 
         Vector2 mouse = boardGraphics.GetLocalMousePosition();
@@ -64,7 +68,7 @@ public partial class ChessGame : Node2D
 
                 // if not none then select it
 
-                if (piece.type != Piece.Type.None)
+                if (piece.type != Piece.Type.None && piece.color == turnColor)
                 {
                     // select piece
 

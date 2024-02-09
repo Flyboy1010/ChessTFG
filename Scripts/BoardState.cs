@@ -107,6 +107,16 @@ public struct BoardState
         }
     }
 
+    public bool CanCastle(Piece.Color color)
+    {
+        switch (color)
+        {
+            case Piece.Color.White: return canCastleShortWhite || canCastleLongWhite;
+            case Piece.Color.Black: return canCastleShortBlack || canCastleLongBlack;
+            default: return false;
+        }
+    }
+
     // set castleling flags
 
     public void SetCastleShort(Piece.Color color, bool enabled)
@@ -130,6 +140,21 @@ public struct BoardState
                 canCastleLongWhite = enabled;
                 break;
             case Piece.Color.Black:
+                canCastleLongBlack = enabled;
+                break;
+        }
+    }
+
+    public void SetCastle(Piece.Color color, bool enabled)
+    {
+        switch (color)
+        {
+            case Piece.Color.White:
+                canCastleShortWhite = enabled;
+                canCastleLongWhite = enabled;
+                break;
+            case Piece.Color.Black:
+                canCastleShortBlack = enabled;
                 canCastleLongBlack = enabled;
                 break;
         }

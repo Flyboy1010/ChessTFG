@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using static Board;
 
 public static class MoveGeneration
 {
@@ -28,6 +29,23 @@ public static class MoveGeneration
     private static readonly int[][] preCalculatedKnightMoves = new int[64][];
     private static readonly int[][] preCalculatedKingMoves = new int[64][];
     private static readonly int[][][] preCalculatedPawnCapturesMoves = new int[2][][];
+
+    // for castling [0] -> white, [1] -> black
+
+    private static readonly int[][] shortCastleSquaresIndices = new int[2][]
+    {
+        new int[] { F1, G1 },
+        new int[] { F8, G8 }
+    };
+
+    private static readonly int[][] longCastleSquaresIndices = new int[2][]
+    {
+        new int[] { D1, C1 },
+        new int[] { D8, C8 }
+    };
+
+    private static readonly int[] shortCastleTargetKingSquareIndex = new int[2] { G1, G8 };
+    private static readonly int[] longCastleTargetKingSquareIndex = new int[2] { C1, C8 };
 
     // static ctor
 
@@ -567,6 +585,118 @@ public static class MoveGeneration
         return moves;
     }
 
+
+    // generate king moves
+
+    private static List<Move> GenerateKingMoves(Board board, int index)
+    {
+        List<Move> moves = new List<Move>();
+
+        Piece piece = board.GetPiece(index);
+
+        // normal moves
+
+        int[] kingMoves = preCalculatedKingMoves[index];
+
+        foreach (int targetIndex in kingMoves)
+        {
+            Piece targetPiece = board.GetPiece(targetIndex);
+
+            if (targetPiece.type == Piece.Type.None || targetPiece.color != piece.color)
+            {
+                moves.Add(new Move
+                {
+                    squareSourceIndex = index,
+                    squareTargetIndex = targetIndex,
+                    pieceSource = piece,
+                    pieceTarget = targetPiece
+                });
+            }
+        }
+
+        // castling moves
+
+        ref readonly BoardState boardState = ref board.GetBoardState();
+        bool canCastleShort = boardState.CanCastleShort(piece.color);
+        bool canCastleLong = boardState.CanCastleLong(piece.color);
+
+        if (canCastleShort || canCastleLong)
+        {
+            bool[] controlledSquaresByOpponent = GetControlledSquaresByColor(board, piece.color == Piece.Color.White ? Piece.Color.Black : Piece.Color.White);
+
+            // first check if the king is in check
+
+            bool isKingInCheck = controlledSquaresByOpponent[index];
+
+            // if the king is not in check then
+
+            if (!isKingInCheck)
+            {
+                if (canCastleShort)
+                {
+                    // check squares in between
+
+                    bool isShortCastleLegal = true;
+
+                    foreach (int squareIndex in shortCastleSquaresIndices[(int)piece.color - 1])
+                    {
+                        Piece targetPiece = board.GetPiece(squareIndex);
+
+                        if (controlledSquaresByOpponent[squareIndex] || targetPiece.type != Piece.Type.None)
+                        {
+                            isShortCastleLegal = false;
+                            break;
+                        }
+                    }
+
+                    if (isShortCastleLegal)
+                    {
+                        moves.Add(new Move
+                        {
+                            squareSourceIndex = index,
+                            squareTargetIndex = shortCastleTargetKingSquareIndex[(int)piece.color - 1],
+                            pieceSource = piece,
+                            pieceTarget = new Piece(),
+                            flags = Move.Flags.CastleShort
+                        });
+                    }
+                }
+
+                if (canCastleLong)
+                {
+                    // check squares in between
+
+                    bool isLongCastleLegal = true;
+
+                    foreach (int squareIndex in longCastleSquaresIndices[(int)piece.color - 1])
+                    {
+                        Piece targetPiece = board.GetPiece(squareIndex);
+
+                        if (controlledSquaresByOpponent[squareIndex] || targetPiece.type != Piece.Type.None)
+                        {
+                            isLongCastleLegal = false;
+                            break;
+                        }
+                    }
+
+                    if (isLongCastleLegal)
+                    {
+                        moves.Add(new Move
+                        {
+                            squareSourceIndex = index,
+                            squareTargetIndex = longCastleTargetKingSquareIndex[(int)piece.color - 1],
+                            pieceSource = piece,
+                            pieceTarget = new Piece(),
+                            flags = Move.Flags.CastleLong
+                        });
+                    }
+                }
+            }
+        }
+
+        return moves;
+    }
+
     // generate pseudo legal moves
 
     public static List<Move> GetPseudoLegalMoves(Board board, int index)
@@ -583,6 +713,8 @@ public static class MoveGeneration
             case Piece.Type.Queen:
             case Piece.Type.Rook:
                 return GenerateSlidingMoves(board, index);
+            case Piece.Type.King:
+                return GenerateKingMoves(board, index);
         }
 
         return new List<Move>();

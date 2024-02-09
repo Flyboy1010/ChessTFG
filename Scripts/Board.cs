@@ -282,6 +282,52 @@ public class Board
                 currentBoardState.SetEnPassant(false);
 
                 break;
+            case Move.Flags.CastleShort:
+                // disable en passant
+
+                currentBoardState.SetEnPassant(false);
+
+                // move the king
+
+                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(move.squareTargetIndex, move.pieceSource);
+
+                // move the tower
+
+                switch (move.pieceSource.color)
+                {
+                    case Piece.Color.White:
+                        SetPiece(F1, pieces[H1]);
+                        SetPiece(H1, Piece.NonePiece);
+                        break;
+                    case Piece.Color.Black:
+                        SetPiece(F8, pieces[H8]);
+                        SetPiece(H8, Piece.NonePiece);
+                        break;
+                }
+                break;
+            case Move.Flags.CastleLong:
+                // disable en passant
+
+                currentBoardState.SetEnPassant(false);
+
+                // move the king
+
+                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(move.squareTargetIndex, move.pieceSource);
+
+                switch (move.pieceSource.color)
+                {
+                    case Piece.Color.White:
+                        SetPiece(D1, pieces[A1]);
+                        SetPiece(A1, Piece.NonePiece);
+                        break;
+                    case Piece.Color.Black:
+                        SetPiece(D8, pieces[A8]);
+                        SetPiece(A8, Piece.NonePiece);
+                        break;
+                }
+                break;
             default:
                 // disable en passant
 
@@ -292,6 +338,35 @@ public class Board
                 SetPiece(move.squareSourceIndex, Piece.NonePiece);
                 SetPiece(move.squareTargetIndex, move.pieceSource);
                 break;
+        }
+
+        // check if the king or the towers moved
+
+        if (move.squareSourceIndex == E1 || move.squareTargetIndex == E1) // white king
+        {
+            currentBoardState.SetCastle(Piece.Color.White, false);
+        }
+        else if (move.squareSourceIndex == E8 || move.squareTargetIndex == E8) // black king
+        {
+            currentBoardState.SetCastle(Piece.Color.Black, false);
+        }
+
+        if (move.squareSourceIndex == A1 || move.squareTargetIndex == A1) // white queen side tower
+        {
+            currentBoardState.SetCastleLong(Piece.Color.White, false);
+        }
+        else if (move.squareSourceIndex == H1 || move.squareTargetIndex == H1) // white king side tower
+        {
+            currentBoardState.SetCastleShort(Piece.Color.White, false);
+        }
+
+        if (move.squareSourceIndex == A8 || move.squareTargetIndex == A8) // black queen side tower
+        {
+            currentBoardState.SetCastleLong(Piece.Color.Black, false);
+        }
+        else if (move.squareSourceIndex == H8 || move.squareTargetIndex == H8) // black king side tower
+        {
+            currentBoardState.SetCastleShort(Piece.Color.Black, false);
         }
 
         // push the move onto the stack

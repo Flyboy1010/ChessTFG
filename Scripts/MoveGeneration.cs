@@ -162,6 +162,99 @@ public static class MoveGeneration
         }
     }
 
+    // get controlled squares by color
+
+    public static bool[] GetControlledSquaresByColor(Board board, Piece.Color color)
+    {
+        bool[] squares = new bool[64];
+
+        List<int> piecesIndices = board.GetPiecesIndices(color);
+
+        foreach (int index in piecesIndices)
+        {
+            Piece piece = board.GetPiece(index);
+
+            switch (piece.type)
+            {
+                case Piece.Type.Pawn:
+                    int[] pawnCaptures = preCalculatedPawnCapturesMoves[(int)piece.color - 1][index];
+
+                    foreach (int targetIndex in pawnCaptures)
+                    {
+                        Piece targetPiece = board.GetPiece(targetIndex);
+
+                        if (targetPiece.color != piece.color) // none pieces have also none color
+                        {
+                            squares[targetIndex] = true;
+                        }
+                    }
+                    break;
+                case Piece.Type.Knight:
+                    foreach (int targetIndex in preCalculatedKnightMoves[index])
+                    {
+                        Piece targetPiece = board.GetPiece(targetIndex);
+
+                        // if the square is empty or the pieces color are diferent then add the move to the list
+
+                        if (targetPiece.type == Piece.Type.None || targetPiece.color != piece.color)
+                        {
+                            squares[targetIndex] = true;
+                        }
+                    }
+                    break;
+                case Piece.Type.Bishop:
+                case Piece.Type.Rook:
+                case Piece.Type.Queen:
+                    int startDirection = (piece.type != Piece.Type.Bishop) ? 0 : 4;
+                    int endDirection = (piece.type != Piece.Type.Rook) ? 8 : 4;
+
+                    for (int d = startDirection; d < endDirection; d++)
+                    {
+                        int n = preCalculatedSquaresToEdge[index][d];
+
+                        for (int i = 0; i < n; i++)
+                        {
+                            int targetIndex = index + directionOffsets[d] * (i + 1);
+
+                            Piece targetPiece = board.GetPiece(targetIndex);
+
+                            // check pieces in the path
+
+                            if (targetPiece.type == Piece.Type.None)
+                            {
+                                squares[targetIndex] = true;
+                            }
+                            else
+                            {
+                                if (targetPiece.color != piece.color)
+                                {
+                                    squares[targetIndex] = true;
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                case Piece.Type.King:
+                    int[] kingMoves = preCalculatedKingMoves[index];
+
+                    foreach (int targetIndex in kingMoves)
+                    {
+                        Piece targetPiece = board.GetPiece(targetIndex);
+
+                        if (targetPiece.type == Piece.Type.None || targetPiece.color != piece.color)
+                        {
+                            squares[targetIndex] = true;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        return squares;
+    }
+
     // generate knight moves
 
     private static List<Move> GenerateKnightMoves(Board board, int index)

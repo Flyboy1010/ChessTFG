@@ -22,6 +22,8 @@ public class Board
     // array with the pieces
 
     private Piece[] pieces = new Piece[64];
+    private List<int> piecesIndicesWhite = new List<int>();
+    private List<int> piecesIndicesBlack = new List<int>();
 
     // list of board states & moves done
 
@@ -46,11 +48,58 @@ public class Board
         return pieces[index];
     }
 
-    // get turn color
+    // set piece
 
-    public Piece.Color GetTurnColor()
+    public void SetPiece(int index, Piece piece)
     {
-        return currentBoardState.GetTurnColor();
+        // handle previous piece
+
+        Piece piecePrevious = pieces[index];
+
+        if (piecePrevious.type != Piece.Type.None)
+        {
+            switch (piecePrevious.color)
+            {
+                case Piece.Color.White:
+                    piecesIndicesWhite.Remove(index);
+                    break;
+                case Piece.Color.Black:
+                    piecesIndicesBlack.Remove(index);
+                    break;
+            }
+        }
+
+        // handle new piece
+
+        if (piece.type != Piece.Type.None)
+        {
+            switch (piece.color)
+            {
+                case Piece.Color.White:
+                    piecesIndicesWhite.Add(index);
+                    break;
+                case Piece.Color.Black:
+                    piecesIndicesBlack.Add(index);
+                    break;
+            }
+        }
+
+        // set the piece
+
+        pieces[index] = piece;
+    }
+
+    // get pieces indices by color
+
+    public List<int> GetPiecesIndices(Piece.Color color)
+    {
+        switch (color)
+        {
+            case Piece.Color.White: return piecesIndicesWhite;
+            case Piece.Color.Black: return piecesIndicesBlack;
+        }
+
+        return new List<int>();
     }
 
     // get current board state
@@ -60,11 +109,11 @@ public class Board
         return ref currentBoardState;
     }
 
-    // place piece
+    // get turn color
 
-    public void PlacePiece(int index, Piece piece)
+    public Piece.Color GetTurnColor()
     {
-        pieces[index] = piece;
+        return currentBoardState.GetTurnColor();
     }
 
     // load fen string
@@ -97,7 +146,7 @@ public class Board
 
                 for (int ii = 0; ii < n; ii++)
                 {
-                    PlacePiece((i + ii) + j * 8, Piece.NonePiece);
+                    SetPiece((i + ii) + j * 8, Piece.NonePiece);
                 }
 
                 i += n;
@@ -107,7 +156,7 @@ public class Board
                 int index = i + j * 8;
                 Piece.Type pieceType = Utils.CharToPieceType(symbol); // must be a piece symbol then
                 Piece.Color pieceColor = char.IsUpper(symbol) ? Piece.Color.White : Piece.Color.Black;
-                PlacePiece(index, new Piece()
+                SetPiece(index, new Piece()
                 {
                     type = pieceType,
                     color = pieceColor
@@ -206,16 +255,16 @@ public class Board
 
                 // move the piece
 
-                PlacePiece(move.squareSourceIndex, Piece.NonePiece);
-                PlacePiece(move.squareTargetIndex, move.pieceSource);
+                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(move.squareTargetIndex, move.pieceSource);
                 break;
             case Move.Flags.Promotion:
                 // disable en passant
 
                 currentBoardState.SetEnPassant(false);
 
-                PlacePiece(move.squareSourceIndex, Piece.NonePiece);
-                PlacePiece(move.squareTargetIndex, new Piece()
+                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(move.squareTargetIndex, new Piece()
                 {
                     type = move.promotionPieceType,
                     color = move.pieceSource.color
@@ -224,9 +273,9 @@ public class Board
             case Move.Flags.EnPassant:
                 // do en passant capture
 
-                PlacePiece(currentBoardState.GetEnPassantSquareIndex(), Piece.NonePiece);
-                PlacePiece(move.squareSourceIndex, Piece.NonePiece);
-                PlacePiece(move.squareTargetIndex, move.pieceSource);
+                SetPiece(currentBoardState.GetEnPassantSquareIndex(), Piece.NonePiece);
+                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(move.squareTargetIndex, move.pieceSource);
 
                 // disable en passant
 
@@ -240,8 +289,8 @@ public class Board
 
                 // move the piece to the target
 
-                PlacePiece(move.squareSourceIndex, Piece.NonePiece);
-                PlacePiece(move.squareTargetIndex, move.pieceSource);
+                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(move.squareTargetIndex, move.pieceSource);
                 break;
         }
 

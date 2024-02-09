@@ -23,6 +23,12 @@ public struct Piece
         Black
     }
 
+    public static readonly Piece NonePiece = new Piece() 
+    { 
+        type = Type.None,
+        color = Color.None 
+    };
+
     public Type type;
     public Color color;
 }

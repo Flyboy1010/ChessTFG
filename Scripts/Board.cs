@@ -60,6 +60,13 @@ public class Board
         return ref currentBoardState;
     }
 
+    // place piece
+
+    public void PlacePiece(int index, Piece piece)
+    {
+        pieces[index] = piece;
+    }
+
     // load fen string
 
     public void LoadFenString(string fen)
@@ -90,7 +97,7 @@ public class Board
 
                 for (int ii = 0; ii < n; ii++)
                 {
-                    pieces[(i + ii) + j * 8] = new Piece(); // "none" piece
+                    PlacePiece((i + ii) + j * 8, Piece.NonePiece);
                 }
 
                 i += n;
@@ -100,7 +107,11 @@ public class Board
                 int index = i + j * 8;
                 Piece.Type pieceType = Utils.CharToPieceType(symbol); // must be a piece symbol then
                 Piece.Color pieceColor = char.IsUpper(symbol) ? Piece.Color.White : Piece.Color.Black;
-                pieces[index] = new Piece { type = pieceType, color = pieceColor };
+                PlacePiece(index, new Piece()
+                {
+                    type = pieceType,
+                    color = pieceColor
+                });
                 i++;
             }
         }
@@ -182,10 +193,6 @@ public class Board
 
         boardStates.Push(currentBoardState);
 
-        // clear the piece at the source square
-
-        pieces[move.squareSourceIndex] = new Piece(); // remove piece at the "Source" square
-
         // check move flags
 
         switch (move.flags)
@@ -199,20 +206,27 @@ public class Board
 
                 // move the piece
 
-                pieces[move.squareTargetIndex] = move.pieceSource;
+                PlacePiece(move.squareSourceIndex, Piece.NonePiece);
+                PlacePiece(move.squareTargetIndex, move.pieceSource);
                 break;
             case Move.Flags.Promotion:
                 // disable en passant
 
                 currentBoardState.SetEnPassant(false);
 
-                pieces[move.squareTargetIndex] = new Piece { type = move.promotionPieceType, color = move.pieceSource.color };
+                PlacePiece(move.squareSourceIndex, Piece.NonePiece);
+                PlacePiece(move.squareTargetIndex, new Piece()
+                {
+                    type = move.promotionPieceType,
+                    color = move.pieceSource.color
+                });
                 break;
             case Move.Flags.EnPassant:
                 // do en passant capture
 
-                pieces[currentBoardState.GetEnPassantSquareIndex()] = new Piece();
-                pieces[move.squareTargetIndex] = move.pieceSource;
+                PlacePiece(currentBoardState.GetEnPassantSquareIndex(), Piece.NonePiece);
+                PlacePiece(move.squareSourceIndex, Piece.NonePiece);
+                PlacePiece(move.squareTargetIndex, move.pieceSource);
 
                 // disable en passant
 
@@ -226,7 +240,8 @@ public class Board
 
                 // move the piece to the target
 
-                pieces[move.squareTargetIndex] = move.pieceSource;
+                PlacePiece(move.squareSourceIndex, Piece.NonePiece);
+                PlacePiece(move.squareTargetIndex, move.pieceSource);
                 break;
         }
 

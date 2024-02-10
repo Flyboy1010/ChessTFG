@@ -697,6 +697,28 @@ public static class MoveGeneration
         return moves;
     }
 
+    // check if the king of the selected color is in check
+
+    public static bool IsKingInCheck(Board board, Piece.Color color)
+    {
+        // first find the king of the selected color
+
+        int kingSquareIndex = board.FindKing(color);
+
+        // get all the controlled squares by the opponent pieces
+
+        bool[] controlledSquares = GetControlledSquaresByColor(board, color == Piece.Color.White ? Piece.Color.Black : Piece.Color.White);
+
+        // check if the king square is attacked
+
+        if (controlledSquares[kingSquareIndex])
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     // generate pseudo legal moves
 
     public static List<Move> GetPseudoLegalMoves(Board board, int index)
@@ -718,5 +740,35 @@ public static class MoveGeneration
         }
 
         return new List<Move>();
+    }
+
+    // get legal moves
+
+    public static List<Move> GetLegalMoves(Board board, int index)
+    {
+        List<Move> legalMoves = new List<Move>();
+        List<Move> pseudoLegalMoves = GetPseudoLegalMoves(board, index);
+
+        Piece piece = board.GetPiece(index);
+
+        foreach (Move move in pseudoLegalMoves)
+        {
+            // make the move
+
+            board.MakeMove(move);
+
+            // check if after the move the king is in check (if not then the move is legal)
+
+            if (!IsKingInCheck(board, piece.color))
+            {
+                legalMoves.Add(move);
+            }
+
+            // undo the move
+
+            board.UndoMove();
+        }
+
+        return legalMoves;
     }
 }

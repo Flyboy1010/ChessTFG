@@ -74,7 +74,7 @@ public partial class ChessGame : Node2D
 
                     isPieceSelected = true;
                     pieceSelectedIndex = squareIndex;
-                    pieceSelectedMoves = MoveGeneration.GetPseudoLegalMoves(board, squareIndex);
+                    pieceSelectedMoves = MoveGeneration.GetLegalMoves(board, squareIndex);
 
                     // set hint moves
 

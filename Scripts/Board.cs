@@ -102,6 +102,25 @@ public class Board
         return new List<int>();
     }
 
+    // find king 
+
+    public int FindKing(Piece.Color color)
+    {
+        List<int> indices = GetPiecesIndices(color);
+
+        foreach (int index in indices)
+        {
+            if (pieces[index].type == Piece.Type.King)
+            {
+                return index;
+            }
+        }
+
+        GD.PrintErr("there is no king?");
+
+        return 0;
+    }
+
     // get current board state
 
     public ref readonly BoardState GetBoardState()
@@ -383,6 +402,73 @@ public class Board
 
     public void UndoMove()
     {
+        if (boardStates.Count > 0)
+        {
+            // get back to the last state
 
+            currentBoardState = boardStates.Pop();
+
+            // get the last move and undo it
+
+            Move move = moves.Pop();
+
+            // undo move
+
+            SetPiece(move.squareSourceIndex, move.pieceSource);
+            SetPiece(move.squareTargetIndex, move.pieceTarget);
+
+            switch (move.flags)
+            {
+                case Move.Flags.CastleShort:
+                    switch (move.pieceSource.color)
+                    {
+                        case Piece.Color.White:
+                            SetPiece(F1, Piece.NonePiece);
+                            SetPiece(H1, new Piece()
+                            {
+                                type = Piece.Type.Rook,
+                                color = Piece.Color.White
+                            });
+                            break;
+                        case Piece.Color.Black:
+                            SetPiece(F8, Piece.NonePiece);
+                            SetPiece(H8, new Piece()
+                            {
+                                type = Piece.Type.Rook,
+                                color = Piece.Color.Black
+                            });
+                            break;
+                    }
+                    break;
+                case Move.Flags.CastleLong:
+                    switch (move.pieceSource.color)
+                    {
+                        case Piece.Color.White:
+                            SetPiece(D1, Piece.NonePiece);
+                            SetPiece(A1, new Piece()
+                            {
+                                type = Piece.Type.Rook,
+                                color = Piece.Color.White
+                            });
+                            break;
+                        case Piece.Color.Black:
+                            SetPiece(D8, Piece.NonePiece);
+                            SetPiece(A8, new Piece()
+                            {
+                                type = Piece.Type.Rook,
+                                color = Piece.Color.Black
+                            });
+                            break;
+                    }
+                    break;
+                case Move.Flags.EnPassant:
+                    SetPiece(currentBoardState.GetEnPassantSquareIndex(), new Piece()
+                    {
+                        type = Piece.Type.Pawn,
+                        color = currentBoardState.GetEnPassantColor()
+                    });
+                    break;
+            }
+        }
     }
 }

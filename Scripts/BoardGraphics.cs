@@ -210,6 +210,13 @@ public partial class BoardGraphics : Node2D
         }
     }
 
+    // play move
+
+    public void AnimateMove(Move move, bool isAnimated, Callable onFinish)
+    {
+
+    }
+
     // Called every frame. 'delta' is the elapsed time since the previous frame.
 
     public override void _Process(double delta)

@@ -24,6 +24,7 @@ hintCircleMaterial = ExtResource("4_cq3bx")
 hintCircleWithHoleMaterial = ExtResource("5_5kytk")
 
 [node name="BoardSquares" type="ColorRect" parent="BoardGraphics"]
+show_behind_parent = true
 material = SubResource("ShaderMaterial_b1cto")
 offset_right = 840.0
 offset_bottom = 840.0

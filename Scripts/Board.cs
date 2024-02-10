@@ -10,6 +10,7 @@ public class Board
     public static readonly int E1 = 60, E8 = 4; // king squares
     public static readonly int C1 = 58, C8 = 2, G1 = 62, G8 = 6;
     public static readonly int F1 = 61, D1 = 59, F8 = 5, D8 = 3; // tower castling target squares
+    public static readonly int B1 = 57, B8 = 1;
 
     // start fen string
 

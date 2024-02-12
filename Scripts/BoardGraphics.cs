@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using static Board;
 
 public partial class BoardGraphics : Node2D
 {
@@ -12,12 +13,14 @@ public partial class BoardGraphics : Node2D
         PieceSelected = 1
     }
 
-	// texture with the pieces
+	// exported variables
 
 	[Export] private int squareSize;
 	[Export] private Texture2D piecesTexture;
+    [Export] private Color lastMoveColor;
     [Export] private Material hintCircleMaterial;
     [Export] private Material hintCircleWithHoleMaterial;
+    [Export] private float animationTime;
 
 	// board 
 
@@ -39,9 +42,13 @@ public partial class BoardGraphics : Node2D
 
     private Vector2I pieceTextureSize;
 
-	// Called when the node enters the scene tree for the first time.
+    // tween for animating the pieces
 
-	public override void _Ready()
+    private Tween tween;
+
+    // Called when the node enters the scene tree for the first time.
+
+    public override void _Ready()
 	{
         // init
 
@@ -214,13 +221,151 @@ public partial class BoardGraphics : Node2D
 
     public void AnimateMove(Move move, bool isAnimated, Callable onFinish)
     {
+        // kill previous tween
 
+        if (tween != null)
+        {
+            tween.Kill();
+        }
+
+        // create new tween
+
+        tween = CreateTween();
+        tween.SetTrans(Tween.TransitionType.Cubic);
+        tween.SetParallel(true);
+
+        // get the source piece sprite
+
+        Sprite2D pieceSprite = piecesSprites[move.squareSourceIndex];
+
+        // "select it"
+
+        pieceSprite.ZIndex = (int)SpriteZIndex.PieceSelected;
+
+        // calculate the position of the target square (in grid space)
+
+        int i = move.squareTargetIndex % 8;
+        int j = move.squareTargetIndex / 8;
+
+        if (isBoardFlipped)
+        {
+            i = 7 - i;
+            j = 7 - j;
+        }
+
+        // check if should be animated or not
+
+        if (isAnimated)
+        {
+            // tween the piece position to the center of the target square
+
+            tween.TweenProperty(pieceSprite, "position", new Vector2(i + 0.5f, j + 0.5f) * squareSize, animationTime);
+        }
+        else
+        {
+            // instantly move the piece to that square
+
+            pieceSprite.Position = new Vector2(i + 0.5f, j + 0.5f) * squareSize;
+        }
+
+        // if the move is castling you need to animate the tower aswell
+
+        if (move.flags == Move.Flags.CastleShort)
+        {
+            int rookTargetSquareIndex = 0;
+            Sprite2D towerPieceSprite = null;
+
+            switch (move.pieceSource.color)
+            {
+                case Piece.Color.White:
+                    rookTargetSquareIndex = F1;
+                    towerPieceSprite = piecesSprites[H1];
+                    break;
+                case Piece.Color.Black:
+                    rookTargetSquareIndex = F8;
+                    towerPieceSprite = piecesSprites[H8];
+                    break;
+            }
+
+            towerPieceSprite.ZIndex = (int)SpriteZIndex.PieceSelected + 1;
+
+            int rook_i = rookTargetSquareIndex % 8;
+            int rook_j = rookTargetSquareIndex / 8;
+
+            if (isBoardFlipped)
+            {
+                rook_i = 7 - rook_i;
+                rook_j = 7 - rook_j;
+            }
+
+            tween.TweenProperty(towerPieceSprite, "position", new Vector2(rook_i + 0.5f, rook_j + 0.5f) * squareSize, animationTime);
+        }
+        else if (move.flags == Move.Flags.CastleLong)
+        {
+            int rookTargetSquareIndex = 0;
+            Sprite2D towerPieceSprite = null;
+
+            switch (move.pieceSource.color)
+            {
+                case Piece.Color.White:
+                    rookTargetSquareIndex = D1;
+                    towerPieceSprite = piecesSprites[A1];
+                    break;
+                case Piece.Color.Black:
+                    rookTargetSquareIndex = D8;
+                    towerPieceSprite = piecesSprites[A8];
+                    break;
+            }
+
+            towerPieceSprite.ZIndex = (int)SpriteZIndex.PieceSelected + 1;
+
+            int rook_i = rookTargetSquareIndex % 8;
+            int rook_j = rookTargetSquareIndex / 8;
+
+            if (isBoardFlipped)
+            {
+                rook_i = 7 - rook_i;
+                rook_j = 7 - rook_j;
+            }
+
+            tween.TweenProperty(towerPieceSprite, "position", new Vector2(rook_i + 0.5f, rook_j + 0.5f) * squareSize, animationTime);
+        }
+
+        // at the end of the animation update the pieces & call on finish callback
+
+        tween.Chain().TweenCallback(onFinish);
+    }
+
+    // draw
+
+    public override void _Draw()
+    {
+        // draw last move
+
+        if (board.TryGetLastMove(out Move lastMove))
+        {
+            int si = lastMove.squareSourceIndex % 8;
+            int sj = lastMove.squareSourceIndex / 8;
+            int ti = lastMove.squareTargetIndex % 8;
+            int tj = lastMove.squareTargetIndex / 8;
+
+            if (isBoardFlipped)
+            {
+                si = 7 - si;
+                sj = 7 - sj;
+                ti = 7 - ti;
+                tj = 7 - tj;
+            }
+
+            DrawRect(new Rect2(new Vector2(si, sj) * squareSize, squareSize, squareSize), lastMoveColor);
+            DrawRect(new Rect2(new Vector2(ti, tj) * squareSize, squareSize, squareSize), lastMoveColor);
+        }
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
 
     public override void _Process(double delta)
 	{
-        
+        QueueRedraw();
     }
 }

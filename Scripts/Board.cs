@@ -103,6 +103,27 @@ public class Board
         return new List<int>();
     }
 
+    // get last move
+
+    public bool TryGetLastMove(out Move move)
+    {
+        return moves.TryPeek(out move);
+    }
+
+    // get current board state
+
+    public ref readonly BoardState GetBoardState()
+    {
+        return ref currentBoardState;
+    }
+
+    // get turn color
+
+    public Piece.Color GetTurnColor()
+    {
+        return currentBoardState.GetTurnColor();
+    }
+
     // find king 
 
     public int FindKing(Piece.Color color)
@@ -120,20 +141,6 @@ public class Board
         GD.PrintErr("there is no king?");
 
         return 0;
-    }
-
-    // get current board state
-
-    public ref readonly BoardState GetBoardState()
-    {
-        return ref currentBoardState;
-    }
-
-    // get turn color
-
-    public Piece.Color GetTurnColor()
-    {
-        return currentBoardState.GetTurnColor();
     }
 
     // load fen string

@@ -1,0 +1,46 @@
+[gd_scene load_steps=8 format=3 uid="uid://diioigr62k7wp"]
+
+[ext_resource type="Script" path="res://Scripts/Game.cs" id="1_ebuse"]
+[ext_resource type="Script" path="res://Scripts/BoardGraphics.cs" id="2_yqws2"]
+[ext_resource type="Texture2D" uid="uid://d1w0vck3rhrlq" path="res://Assets/Sprites/pieces.png" id="3_jgm65"]
+[ext_resource type="Material" uid="uid://dlsj35nvx3d5q" path="res://Materials/CircleMaterial.tres" id="4_yg707"]
+[ext_resource type="Material" uid="uid://citlsk4gvtxuo" path="res://Materials/CircleWithHoleMaterial.tres" id="5_1ckw8"]
+[ext_resource type="Shader" path="res://Shaders/BoardSquares.gdshader" id="6_8nyfd"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_b1cto"]
+shader = ExtResource("6_8nyfd")
+shader_parameter/u_colorWhite = Color(0.941176, 0.941176, 0.941176, 1)
+shader_parameter/u_colorBlack = Color(0.529412, 0.470588, 0.721569, 1)
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_ebuse")
+
+[node name="BoardGraphics" type="Node2D" parent="."]
+position = Vector2(540, 120)
+script = ExtResource("2_yqws2")
+squareSize = 105
+piecesTexture = ExtResource("3_jgm65")
+lastMoveColor = Color(0.490196, 0.678431, 0.788235, 0.501961)
+hintCircleMaterial = ExtResource("4_yg707")
+hintCircleWithHoleMaterial = ExtResource("5_1ckw8")
+animationTime = 0.3
+metadata/_edit_group_ = true
+
+[node name="BoardSquares" type="ColorRect" parent="BoardGraphics"]
+show_behind_parent = true
+material = SubResource("ShaderMaterial_b1cto")
+offset_right = 840.0
+offset_bottom = 840.0
+metadata/_edit_group_ = true
+
+[node name="BoardBackground" type="ColorRect" parent="BoardGraphics/BoardSquares"]
+show_behind_parent = true
+layout_mode = 0
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 856.0
+offset_bottom = 856.0
+color = Color(0.22, 0.22, 0.22, 1)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(960, 540)

@@ -534,7 +534,7 @@ public static class MoveGeneration
                                 squareSourceIndex = index,
                                 squareTargetIndex = targetIndex,
                                 pieceSource = piece,
-                                pieceTarget = new Piece(),
+                                pieceTarget = Piece.NonePiece,
                                 flags = Move.Flags.EnPassant
                             });
                         }
@@ -546,7 +546,7 @@ public static class MoveGeneration
                                 squareSourceIndex = index,
                                 squareTargetIndex = targetIndex,
                                 pieceSource = piece,
-                                pieceTarget = new Piece(),
+                                pieceTarget = Piece.NonePiece,
                                 flags = Move.Flags.EnPassant
                             });
                         }
@@ -563,7 +563,7 @@ public static class MoveGeneration
                                 squareSourceIndex = index,
                                 squareTargetIndex = targetIndex,
                                 pieceSource = piece,
-                                pieceTarget = new Piece(),
+                                pieceTarget = Piece.NonePiece,
                                 flags = Move.Flags.EnPassant
                             });
                         }
@@ -575,7 +575,7 @@ public static class MoveGeneration
                                 squareSourceIndex = index,
                                 squareTargetIndex = targetIndex,
                                 pieceSource = piece,
-                                pieceTarget = new Piece(),
+                                pieceTarget = Piece.NonePiece,
                                 flags = Move.Flags.EnPassant
                             });
                         }
@@ -658,7 +658,7 @@ public static class MoveGeneration
                             squareSourceIndex = index,
                             squareTargetIndex = shortCastleTargetKingSquareIndex[(int)piece.color - 1],
                             pieceSource = piece,
-                            pieceTarget = new Piece(),
+                            pieceTarget = Piece.NonePiece,
                             flags = Move.Flags.CastleShort
                         });
                     }
@@ -699,7 +699,7 @@ public static class MoveGeneration
                             squareSourceIndex = index,
                             squareTargetIndex = longCastleTargetKingSquareIndex[(int)piece.color - 1],
                             pieceSource = piece,
-                            pieceTarget = new Piece(),
+                            pieceTarget = Piece.NonePiece,
                             flags = Move.Flags.CastleLong
                         });
                     }

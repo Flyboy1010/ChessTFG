@@ -117,6 +117,10 @@ public partial class Game : Node2D
 
                 boardGraphics.SetPieceSpritePosition(pieceSelectedIndex, mouse);
 
+                // select square
+
+                boardGraphics.SelectSquare(isOnSquare ? squareIndex : -1);
+
                 // if stop holding
 
                 if (Input.IsActionJustReleased("Select"))
@@ -126,7 +130,7 @@ public partial class Game : Node2D
                         // if the square is a valid move
 
                         bool isLegalMove = false;
-                        Move selectedMove = new Move();
+                        Move selectedMove = Move.NullMove;
 
                         foreach (Move move in pieceSelectedMoves)
                         {
@@ -150,6 +154,10 @@ public partial class Game : Node2D
                             zobristLabel.Text = Utils.ConvertULongToBinaryString(key);
                             zobrist2Label.Text = "[" + key + "]";
 
+                            // disable square selection
+
+                            boardGraphics.SelectSquare(-1);
+
                             // disable hint moves
 
                             boardGraphics.SetHintMoves(null);
@@ -172,6 +180,10 @@ public partial class Game : Node2D
                         }
                     }
 
+                    // disable selected square
+
+                    boardGraphics.SelectSquare(-1);
+
                     // update graphics
 
                     boardGraphics.UpdateGraphics();
@@ -191,7 +203,7 @@ public partial class Game : Node2D
                         // if the square is a valid move
 
                         bool isLegalMove = false;
-                        Move selectedMove = new Move();
+                        Move selectedMove = Move.NullMove;
 
                         foreach (Move move in pieceSelectedMoves)
                         {

@@ -17,14 +17,15 @@ public partial class BoardGraphics : Node2D
 
 	[Export] private int squareSize;
 	[Export] private Texture2D piecesTexture;
-    [Export] private Color lastMoveColor;
+    [Export] private Color hintLastMoveColor;
     [Export] private Material hintCircleMaterial;
     [Export] private Material hintCircleWithHoleMaterial;
-    [Export] private float animationTime;
+    [Export] private float animationTime = 0.3f;
+    [Export] private bool isBoardFlipped = false;
 
-	// board 
+    // board 
 
-	private Board board;
+    private Board board;
 
 	// array with the sprites representing the pieces
 
@@ -34,13 +35,13 @@ public partial class BoardGraphics : Node2D
 
     private ColorRect[] hintsSprites = new ColorRect[64];
 
-    // board flipped flag
-
-    private bool isBoardFlipped = false;
-
     // the size of a piece inside the texture (in pixels)
 
     private Vector2I pieceTextureSize;
+
+    // selected square
+
+    private int squareSelectedIndex;
 
     // tween for animating the pieces
 
@@ -217,6 +218,13 @@ public partial class BoardGraphics : Node2D
         }
     }
 
+    // select square
+
+    public void SelectSquare(int index)
+    {
+        squareSelectedIndex = index;
+    }
+
     // play move
 
     public void AnimateMove(Move move, bool isAnimated, Callable onFinish)
@@ -357,8 +365,24 @@ public partial class BoardGraphics : Node2D
                 tj = 7 - tj;
             }
 
-            DrawRect(new Rect2(new Vector2(si, sj) * squareSize, squareSize, squareSize), lastMoveColor);
-            DrawRect(new Rect2(new Vector2(ti, tj) * squareSize, squareSize, squareSize), lastMoveColor);
+            DrawRect(new Rect2(new Vector2(si, sj) * squareSize, squareSize, squareSize), hintLastMoveColor);
+            DrawRect(new Rect2(new Vector2(ti, tj) * squareSize, squareSize, squareSize), hintLastMoveColor);
+        }
+
+        // square selected
+
+        if (squareSelectedIndex != -1)
+        {
+            int i = squareSelectedIndex % 8;
+            int j = squareSelectedIndex / 8;
+
+            if (isBoardFlipped)
+            {
+                i = 7 - i;
+                j = 7 - j;
+            }
+
+            DrawRect(new Rect2(i * squareSize + 3, j * squareSize + 3, squareSize - 6, squareSize - 6), new Color(1.0f, 1.0f, 1.0f, 0.65f), false, 6);
         }
 
         //// draw pieces indices

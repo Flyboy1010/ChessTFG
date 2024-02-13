@@ -534,7 +534,7 @@ public static class MoveGeneration
                                 squareSourceIndex = index,
                                 squareTargetIndex = targetIndex,
                                 pieceSource = piece,
-                                pieceTarget = Piece.NonePiece,
+                                pieceTarget = Piece.NullPiece,
                                 flags = Move.Flags.EnPassant
                             });
                         }
@@ -546,7 +546,7 @@ public static class MoveGeneration
                                 squareSourceIndex = index,
                                 squareTargetIndex = targetIndex,
                                 pieceSource = piece,
-                                pieceTarget = Piece.NonePiece,
+                                pieceTarget = Piece.NullPiece,
                                 flags = Move.Flags.EnPassant
                             });
                         }
@@ -563,7 +563,7 @@ public static class MoveGeneration
                                 squareSourceIndex = index,
                                 squareTargetIndex = targetIndex,
                                 pieceSource = piece,
-                                pieceTarget = Piece.NonePiece,
+                                pieceTarget = Piece.NullPiece,
                                 flags = Move.Flags.EnPassant
                             });
                         }
@@ -575,7 +575,7 @@ public static class MoveGeneration
                                 squareSourceIndex = index,
                                 squareTargetIndex = targetIndex,
                                 pieceSource = piece,
-                                pieceTarget = Piece.NonePiece,
+                                pieceTarget = Piece.NullPiece,
                                 flags = Move.Flags.EnPassant
                             });
                         }
@@ -624,7 +624,7 @@ public static class MoveGeneration
 
         if (canCastleShort || canCastleLong)
         {
-            bool[] controlledSquaresByOpponent = GetControlledSquaresByColor(board, piece.color == Piece.Color.White ? Piece.Color.Black : Piece.Color.White);
+            bool[] controlledSquaresByOpponent = GetControlledSquaresByColor(board, Piece.GetOppositeColor(piece.color));
 
             // first check if the king is in check
 
@@ -658,7 +658,7 @@ public static class MoveGeneration
                             squareSourceIndex = index,
                             squareTargetIndex = shortCastleTargetKingSquareIndex[(int)piece.color - 1],
                             pieceSource = piece,
-                            pieceTarget = Piece.NonePiece,
+                            pieceTarget = Piece.NullPiece,
                             flags = Move.Flags.CastleShort
                         });
                     }
@@ -699,7 +699,7 @@ public static class MoveGeneration
                             squareSourceIndex = index,
                             squareTargetIndex = longCastleTargetKingSquareIndex[(int)piece.color - 1],
                             pieceSource = piece,
-                            pieceTarget = Piece.NonePiece,
+                            pieceTarget = Piece.NullPiece,
                             flags = Move.Flags.CastleLong
                         });
                     }
@@ -720,7 +720,7 @@ public static class MoveGeneration
 
         // get all the controlled squares by the opponent pieces
 
-        bool[] controlledSquares = GetControlledSquaresByColor(board, color == Piece.Color.White ? Piece.Color.Black : Piece.Color.White);
+        bool[] controlledSquares = GetControlledSquaresByColor(board, Piece.GetOppositeColor(color));
 
         // check if the king square is attacked
 
@@ -783,5 +783,21 @@ public static class MoveGeneration
         }
 
         return legalMoves;
+    }
+
+    // get all legal moves
+
+    public static List<Move> GetAllLegalMovesByColor(Board board, Piece.Color color)
+    {
+        List<Move> moves = new List<Move>();
+
+        int[] piecesIndices = board.GetPiecesIndices(color).ToArray(); // this because the pieces list is modified by get legal moves function
+
+        foreach (int index in piecesIndices)
+        {
+            moves.AddRange(GetLegalMoves(board, index));
+        }
+
+        return moves;
     }
 }

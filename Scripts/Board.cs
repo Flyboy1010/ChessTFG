@@ -173,7 +173,7 @@ public class Board
 
                 for (int ii = 0; ii < n; ii++)
                 {
-                    SetPiece((i + ii) + j * 8, Piece.NonePiece);
+                    SetPiece((i + ii) + j * 8, Piece.NullPiece);
                 }
 
                 i += n;
@@ -282,7 +282,7 @@ public class Board
 
                 // move the piece
 
-                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(move.squareSourceIndex, Piece.NullPiece);
                 SetPiece(move.squareTargetIndex, move.pieceSource);
                 break;
             case Move.Flags.Promotion:
@@ -290,7 +290,7 @@ public class Board
 
                 currentBoardState.SetEnPassant(false);
 
-                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(move.squareSourceIndex, Piece.NullPiece);
                 SetPiece(move.squareTargetIndex, new Piece()
                 {
                     type = move.promotionPieceType,
@@ -300,8 +300,8 @@ public class Board
             case Move.Flags.EnPassant:
                 // do en passant capture
 
-                SetPiece(currentBoardState.GetEnPassantSquareIndex(), Piece.NonePiece);
-                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(currentBoardState.GetEnPassantSquareIndex(), Piece.NullPiece);
+                SetPiece(move.squareSourceIndex, Piece.NullPiece);
                 SetPiece(move.squareTargetIndex, move.pieceSource);
 
                 // disable en passant
@@ -316,7 +316,7 @@ public class Board
 
                 // move the king
 
-                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(move.squareSourceIndex, Piece.NullPiece);
                 SetPiece(move.squareTargetIndex, move.pieceSource);
 
                 // move the tower
@@ -325,11 +325,11 @@ public class Board
                 {
                     case Piece.Color.White:
                         SetPiece(F1, pieces[H1]);
-                        SetPiece(H1, Piece.NonePiece);
+                        SetPiece(H1, Piece.NullPiece);
                         break;
                     case Piece.Color.Black:
                         SetPiece(F8, pieces[H8]);
-                        SetPiece(H8, Piece.NonePiece);
+                        SetPiece(H8, Piece.NullPiece);
                         break;
                 }
                 break;
@@ -340,18 +340,18 @@ public class Board
 
                 // move the king
 
-                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(move.squareSourceIndex, Piece.NullPiece);
                 SetPiece(move.squareTargetIndex, move.pieceSource);
 
                 switch (move.pieceSource.color)
                 {
                     case Piece.Color.White:
                         SetPiece(D1, pieces[A1]);
-                        SetPiece(A1, Piece.NonePiece);
+                        SetPiece(A1, Piece.NullPiece);
                         break;
                     case Piece.Color.Black:
                         SetPiece(D8, pieces[A8]);
-                        SetPiece(A8, Piece.NonePiece);
+                        SetPiece(A8, Piece.NullPiece);
                         break;
                 }
                 break;
@@ -362,7 +362,7 @@ public class Board
 
                 // move the piece to the target
 
-                SetPiece(move.squareSourceIndex, Piece.NonePiece);
+                SetPiece(move.squareSourceIndex, Piece.NullPiece);
                 SetPiece(move.squareTargetIndex, move.pieceSource);
                 break;
         }
@@ -403,7 +403,7 @@ public class Board
         // change turn color
 
         Piece.Color turnColor = currentBoardState.GetTurnColor();
-        currentBoardState.SetTurnColor(turnColor == Piece.Color.White ? Piece.Color.Black : Piece.Color.White);
+        currentBoardState.SetTurnColor(Piece.GetOppositeColor(turnColor));
     }
 
     // undoes the last move
@@ -431,7 +431,7 @@ public class Board
                     switch (move.pieceSource.color)
                     {
                         case Piece.Color.White:
-                            SetPiece(F1, Piece.NonePiece);
+                            SetPiece(F1, Piece.NullPiece);
                             SetPiece(H1, new Piece()
                             {
                                 type = Piece.Type.Rook,
@@ -439,7 +439,7 @@ public class Board
                             });
                             break;
                         case Piece.Color.Black:
-                            SetPiece(F8, Piece.NonePiece);
+                            SetPiece(F8, Piece.NullPiece);
                             SetPiece(H8, new Piece()
                             {
                                 type = Piece.Type.Rook,
@@ -452,7 +452,7 @@ public class Board
                     switch (move.pieceSource.color)
                     {
                         case Piece.Color.White:
-                            SetPiece(D1, Piece.NonePiece);
+                            SetPiece(D1, Piece.NullPiece);
                             SetPiece(A1, new Piece()
                             {
                                 type = Piece.Type.Rook,
@@ -460,7 +460,7 @@ public class Board
                             });
                             break;
                         case Piece.Color.Black:
-                            SetPiece(D8, Piece.NonePiece);
+                            SetPiece(D8, Piece.NullPiece);
                             SetPiece(A8, new Piece()
                             {
                                 type = Piece.Type.Rook,

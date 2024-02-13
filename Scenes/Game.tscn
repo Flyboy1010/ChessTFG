@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://diioigr62k7wp"]
+[gd_scene load_steps=9 format=3 uid="uid://diioigr62k7wp"]
 
 [ext_resource type="Script" path="res://Scripts/Game.cs" id="1_ebuse"]
 [ext_resource type="Script" path="res://Scripts/BoardGraphics.cs" id="2_yqws2"]
@@ -6,21 +6,25 @@
 [ext_resource type="Material" uid="uid://dlsj35nvx3d5q" path="res://Materials/CircleMaterial.tres" id="4_yg707"]
 [ext_resource type="Material" uid="uid://citlsk4gvtxuo" path="res://Materials/CircleWithHoleMaterial.tres" id="5_1ckw8"]
 [ext_resource type="Shader" path="res://Shaders/BoardSquares.gdshader" id="6_8nyfd"]
+[ext_resource type="FontFile" uid="uid://c2i0807otfe57" path="res://Assets/Fonts/Quicksand-Medium.ttf" id="7_63jln"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b1cto"]
 shader = ExtResource("6_8nyfd")
-shader_parameter/u_colorWhite = Color(0.941176, 0.941176, 0.941176, 1)
-shader_parameter/u_colorBlack = Color(0.529412, 0.470588, 0.721569, 1)
+shader_parameter/u_colorWhite = Color(0.921569, 0.85098, 0.768627, 1)
+shader_parameter/u_colorBlack = Color(0.490196, 0.384314, 0.317647, 1)
 
-[node name="Game" type="Node2D"]
+[node name="Game" type="Node2D" node_paths=PackedStringArray("lastMoveLabel", "zobristLabel", "zobrist2Label")]
 script = ExtResource("1_ebuse")
+lastMoveLabel = NodePath("DebugInfo/VBoxContainer/LastMoveLabel")
+zobristLabel = NodePath("ZobristInfo/VBoxContainer/ZobristLabel")
+zobrist2Label = NodePath("ZobristInfo/VBoxContainer/ZobristLabel2")
 
 [node name="BoardGraphics" type="Node2D" parent="."]
 position = Vector2(540, 120)
 script = ExtResource("2_yqws2")
 squareSize = 105
 piecesTexture = ExtResource("3_jgm65")
-lastMoveColor = Color(0.490196, 0.678431, 0.788235, 0.501961)
+lastMoveColor = Color(0.858824, 0.780392, 0.34902, 0.501961)
 hintCircleMaterial = ExtResource("4_yg707")
 hintCircleWithHoleMaterial = ExtResource("5_1ckw8")
 animationTime = 0.3
@@ -36,11 +40,134 @@ metadata/_edit_group_ = true
 [node name="BoardBackground" type="ColorRect" parent="BoardGraphics/BoardSquares"]
 show_behind_parent = true
 layout_mode = 0
-offset_left = -16.0
-offset_top = -16.0
-offset_right = 856.0
-offset_bottom = 856.0
+offset_left = -15.0
+offset_top = -15.0
+offset_right = 855.0
+offset_bottom = 855.0
 color = Color(0.22, 0.22, 0.22, 1)
+
+[node name="DebugInfo" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1485.0
+offset_top = 120.0
+offset_right = 1905.0
+offset_bottom = 960.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 4
+metadata/_edit_group_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DebugInfo"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -52.0
+offset_bottom = 52.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SearchDepthLabel" type="Label" parent="DebugInfo/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.305882, 0.32549, 1)
+theme_override_fonts/font = ExtResource("7_63jln")
+theme_override_font_sizes/font_size = 30
+text = "Search depth: 7"
+vertical_alignment = 1
+
+[node name="EvalLabel" type="Label" parent="DebugInfo/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.960784, 0.639216, 0.356863, 1)
+theme_override_fonts/font = ExtResource("7_63jln")
+theme_override_font_sizes/font_size = 30
+text = "Evaluation: -0.5"
+vertical_alignment = 1
+
+[node name="LastMoveLabel" type="Label" parent="DebugInfo/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.717647, 0.584314, 0.870588, 1)
+theme_override_fonts/font = ExtResource("7_63jln")
+theme_override_font_sizes/font_size = 30
+text = "Last move:"
+vertical_alignment = 1
+
+[node name="ZobristInfo" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 330.0
+offset_top = 975.0
+offset_right = 1590.0
+offset_bottom = 1065.0
+metadata/_edit_group_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ZobristInfo"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="ZobristLabel" type="Label" parent="ZobristInfo/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.619608, 0.776471, 0.921569, 1)
+theme_override_fonts/font = ExtResource("7_63jln")
+theme_override_font_sizes/font_size = 30
+text = "101010101101011010101010101010101010101000000000000000"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ZobristLabel2" type="Label" parent="ZobristInfo/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.411765, 0.411765, 0.411765, 1)
+theme_override_fonts/font = ExtResource("7_63jln")
+theme_override_font_sizes/font_size = 25
+text = "[45134523436246]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameOverInfo" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 330.0
+offset_top = 15.0
+offset_right = 1590.0
+offset_bottom = 105.0
+metadata/_edit_group_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameOverInfo"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="GameOverLabel" type="Label" parent="GameOverInfo/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("7_63jln")
+theme_override_font_sizes/font_size = 30
+text = "Game Over"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GamerOverRreasonLabel" type="Label" parent="GameOverInfo/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.411765, 0.411765, 0.411765, 1)
+theme_override_fonts/font = ExtResource("7_63jln")
+theme_override_font_sizes/font_size = 25
+text = "Black wins by checkmate"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 540)

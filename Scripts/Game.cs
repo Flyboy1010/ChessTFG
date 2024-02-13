@@ -4,9 +4,15 @@ using System.Collections.Generic;
 
 public partial class Game : Node2D
 {
-	// board class that contains everything related to the pieces
+    // label with the last move
 
-	private Board board;
+    [Export] private Label lastMoveLabel;
+    [Export] private Label zobristLabel;
+    [Export] private Label zobrist2Label;
+
+    // board class that contains everything related to the pieces
+
+    private Board board;
 
 	// graphical representation of a board
 
@@ -49,6 +55,12 @@ public partial class Game : Node2D
 		// update the board graphics
 
 		boardGraphics.UpdateGraphics();
+
+        // testing
+
+        ulong key = ZobristHashing.GetKey(board);
+        zobristLabel.Text = Utils.ConvertULongToBinaryString(key);
+        zobrist2Label.Text = "[" + key + "]";
     }
 
     private void BoardUIUpdate()
@@ -133,6 +145,10 @@ public partial class Game : Node2D
                             // make the move
 
                             board.MakeMove(selectedMove);
+                            lastMoveLabel.Text = "Last move: " + Utils.FromMoveToString(selectedMove);
+                            ulong key = ZobristHashing.GetKey(board);
+                            zobristLabel.Text = Utils.ConvertULongToBinaryString(key);
+                            zobrist2Label.Text = "[" + key + "]";
 
                             // disable hint moves
 
@@ -194,6 +210,10 @@ public partial class Game : Node2D
                             // make the move
 
                             board.MakeMove(selectedMove);
+                            lastMoveLabel.Text = "Last move: " + Utils.FromMoveToString(selectedMove);
+                            ulong key = ZobristHashing.GetKey(board);
+                            zobristLabel.Text = Utils.ConvertULongToBinaryString(key);
+                            zobrist2Label.Text = "[" + key + "]";
 
                             // disable hint moves
 

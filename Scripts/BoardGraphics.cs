@@ -360,6 +360,25 @@ public partial class BoardGraphics : Node2D
             DrawRect(new Rect2(new Vector2(si, sj) * squareSize, squareSize, squareSize), lastMoveColor);
             DrawRect(new Rect2(new Vector2(ti, tj) * squareSize, squareSize, squareSize), lastMoveColor);
         }
+
+        //// draw pieces indices
+
+        //List<int> piecesIndicesWhite = board.GetPiecesIndices(Piece.Color.White);
+        //List<int> piecesIndicesBlack = board.GetPiecesIndices(Piece.Color.Black);
+
+        //foreach (int i in piecesIndicesWhite)
+        //{
+        //    int x = i % 8;
+        //    int y = i / 8;
+        //    DrawRect(new Rect2(x * squareSize, y * squareSize, squareSize, squareSize), Color.Color8(0, 255, 0, 80));
+        //}
+
+        //foreach (int i in piecesIndicesBlack)
+        //{
+        //    int x = i % 8;
+        //    int y = i / 8;
+        //    DrawRect(new Rect2(x * squareSize, y * squareSize, squareSize, squareSize), Color.Color8(255, 0, 0, 80));
+        //}
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

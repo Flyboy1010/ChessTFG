@@ -40,4 +40,4 @@ Select={
 [rendering]
 
 renderer/rendering_method="mobile"
-environment/defaults/default_clear_color=Color(0.141176, 0.141176, 0.141176, 1)
+environment/defaults/default_clear_color=Color(0.117647, 0.117647, 0.117647, 1)

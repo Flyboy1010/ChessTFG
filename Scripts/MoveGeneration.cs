@@ -768,7 +768,7 @@ public static class MoveGeneration
         {
             // make the move
 
-            board.MakeMove(move);
+            board.MakeMove(move, true);
 
             // check if after the move the king is in check (if not then the move is legal)
 

@@ -31,6 +31,11 @@ public class Board
     private Stack<BoardState> boardStates = new Stack<BoardState>();
     private Stack<Move> moves = new Stack<Move>();
 
+    // hash map with all the zobrist positions and the times it occured
+
+    public Dictionary<ulong, int> zobristPositionHistory = new Dictionary<ulong, int>();
+    public ulong zobristPosition;
+
     // current state
 
     private BoardState currentBoardState = new BoardState();
@@ -151,6 +156,7 @@ public class Board
 
         boardStates.Clear();
         moves.Clear();
+        zobristPositionHistory.Clear();
 
         // split fen string
 
@@ -259,11 +265,16 @@ public class Board
 
             currentBoardState.SetEnPassantSquareIndex(column + row * 8);
         }
+
+        // zobrist position
+
+        zobristPosition = ZobristHashing.GetKey(this);
+        zobristPositionHistory[zobristPosition] = 1;
     }
 
     // make move
 
-    public void MakeMove(Move move)
+    public void MakeMove(Move move, bool isTesting = false)
     {
         // save current board state
 
@@ -404,6 +415,22 @@ public class Board
 
         Piece.Color turnColor = currentBoardState.GetTurnColor();
         currentBoardState.SetTurnColor(Piece.GetOppositeColor(turnColor));
+
+        // zobrist hashing
+
+        if (!isTesting)
+        {
+            zobristPosition = ZobristHashing.GetKey(this);
+
+            if (zobristPositionHistory.TryGetValue(zobristPosition, out int count))
+            {
+                zobristPositionHistory[zobristPosition] = count + 1;
+            }
+            else
+            {
+                zobristPositionHistory[zobristPosition] = 1;
+            }
+        }
     }
 
     // undoes the last move

@@ -1,29 +1,28 @@
-[gd_scene load_steps=9 format=3 uid="uid://diioigr62k7wp"]
+[gd_scene load_steps=11 format=3 uid="uid://diioigr62k7wp"]
 
 [ext_resource type="Script" path="res://Scripts/Game.cs" id="1_ebuse"]
 [ext_resource type="Script" path="res://Scripts/BoardGraphics.cs" id="2_yqws2"]
-[ext_resource type="Texture2D" uid="uid://d1w0vck3rhrlq" path="res://Assets/Sprites/pieces.png" id="3_jgm65"]
+[ext_resource type="Texture2D" uid="uid://d1w0vck3rhrlq" path="res://Assets/Sprites/pieces.png" id="3_h5sm6"]
 [ext_resource type="Material" uid="uid://dlsj35nvx3d5q" path="res://Materials/CircleMaterial.tres" id="4_yg707"]
 [ext_resource type="Material" uid="uid://citlsk4gvtxuo" path="res://Materials/CircleWithHoleMaterial.tres" id="5_1ckw8"]
 [ext_resource type="Shader" path="res://Shaders/BoardSquares.gdshader" id="6_8nyfd"]
 [ext_resource type="FontFile" uid="uid://c2i0807otfe57" path="res://Assets/Fonts/Quicksand-Medium.ttf" id="7_63jln"]
+[ext_resource type="Script" path="res://Scripts/UI.cs" id="7_lpnj1"]
+[ext_resource type="Theme" uid="uid://4a1keta38hen" path="res://theme.tres" id="7_qn2n2"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b1cto"]
 shader = ExtResource("6_8nyfd")
 shader_parameter/u_colorWhite = Color(0.921569, 0.85098, 0.768627, 1)
 shader_parameter/u_colorBlack = Color(0.490196, 0.384314, 0.317647, 1)
 
-[node name="Game" type="Node2D" node_paths=PackedStringArray("lastMoveLabel", "zobristLabel", "zobrist2Label")]
+[node name="Game" type="Node2D"]
 script = ExtResource("1_ebuse")
-lastMoveLabel = NodePath("DebugInfo/VBoxContainer/LastMoveLabel")
-zobristLabel = NodePath("ZobristInfo/VBoxContainer/ZobristLabel")
-zobrist2Label = NodePath("ZobristInfo/VBoxContainer/ZobristLabel2")
 
 [node name="BoardGraphics" type="Node2D" parent="."]
 position = Vector2(540, 120)
 script = ExtResource("2_yqws2")
 squareSize = 105
-piecesTexture = ExtResource("3_jgm65")
+piecesTexture = ExtResource("3_h5sm6")
 hintLastMoveColor = Color(0.858824, 0.780392, 0.34902, 0.501961)
 hintCircleMaterial = ExtResource("4_yg707")
 hintCircleWithHoleMaterial = ExtResource("5_1ckw8")
@@ -45,21 +44,88 @@ offset_right = 855.0
 offset_bottom = 855.0
 color = Color(0.22, 0.22, 0.22, 1)
 
-[node name="DebugInfo" type="Control" parent="."]
+[node name="UI" type="Control" parent="." node_paths=PackedStringArray("gameOverLabel", "gameOverReasonLabel", "zobristHashNumberLabel", "zobristHashNumberBitsLabel", "lastMoveLabel")]
 layout_mode = 3
+anchors_preset = 0
+script = ExtResource("7_lpnj1")
+gameOverLabel = NodePath("GameOverInfo/VBoxContainer/GameOverLabel")
+gameOverReasonLabel = NodePath("GameOverInfo/VBoxContainer/GamerOverRreasonLabel")
+zobristHashNumberLabel = NodePath("ZobristInfo/VBoxContainer/ZobristLabel")
+zobristHashNumberBitsLabel = NodePath("ZobristInfo/VBoxContainer/ZobristBitsLabel")
+lastMoveLabel = NodePath("DebugInfo/VBoxContainer/LastMoveLabel")
+metadata/_edit_group_ = true
+
+[node name="ButtonsPanel" type="Control" parent="UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 120.0
+offset_top = 225.0
+offset_right = 435.0
+offset_bottom = 855.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_group_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ButtonsPanel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -93.0
+offset_top = -146.0
+offset_right = 93.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 60
+alignment = 1
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="UI/ButtonsPanel/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="PlayWhiteButton" type="Button" parent="UI/ButtonsPanel/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("7_qn2n2")
+text = "Play white"
+
+[node name="PlayBlackButton" type="Button" parent="UI/ButtonsPanel/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("7_qn2n2")
+text = "Play black"
+
+[node name="PlayAIButton" type="Button" parent="UI/ButtonsPanel/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("7_qn2n2")
+text = "AI vs AI"
+
+[node name="QuitButton" type="Button" parent="UI/ButtonsPanel/VBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("7_qn2n2")
+text = "Quit"
+
+[node name="DebugInfo" type="Control" parent="UI"]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 1485.0
 offset_top = 120.0
-offset_right = 1905.0
+offset_right = 1800.0
 offset_bottom = 960.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 4
 metadata/_edit_group_ = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="DebugInfo"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/DebugInfo"]
 layout_mode = 1
 anchors_preset = 14
 anchor_top = 0.5
@@ -70,7 +136,7 @@ offset_bottom = 52.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SearchDepthLabel" type="Label" parent="DebugInfo/VBoxContainer"]
+[node name="SearchDepthLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.803922, 0.305882, 0.32549, 1)
 theme_override_fonts/font = ExtResource("7_63jln")
@@ -78,23 +144,23 @@ theme_override_font_sizes/font_size = 30
 text = "Search depth: 7"
 vertical_alignment = 1
 
-[node name="EvalLabel" type="Label" parent="DebugInfo/VBoxContainer"]
+[node name="EvaluationLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.960784, 0.639216, 0.356863, 1)
 theme_override_fonts/font = ExtResource("7_63jln")
 theme_override_font_sizes/font_size = 30
-text = "Evaluation: -0.5"
+text = "Evaluation: 00.00"
 vertical_alignment = 1
 
-[node name="LastMoveLabel" type="Label" parent="DebugInfo/VBoxContainer"]
+[node name="LastMoveLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.717647, 0.584314, 0.870588, 1)
 theme_override_fonts/font = ExtResource("7_63jln")
 theme_override_font_sizes/font_size = 30
-text = "Last move:"
+text = "Last move: -"
 vertical_alignment = 1
 
-[node name="ZobristInfo" type="Control" parent="."]
+[node name="ZobristInfo" type="Control" parent="UI"]
 layout_mode = 3
 anchors_preset = 0
 offset_left = 330.0
@@ -103,7 +169,7 @@ offset_right = 1590.0
 offset_bottom = 1065.0
 metadata/_edit_group_ = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ZobristInfo"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ZobristInfo"]
 layout_mode = 1
 anchors_preset = 14
 anchor_top = 0.5
@@ -113,25 +179,26 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="ZobristLabel" type="Label" parent="ZobristInfo/VBoxContainer"]
+[node name="ZobristBitsLabel" type="RichTextLabel" parent="UI/ZobristInfo/VBoxContainer"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.619608, 0.776471, 0.921569, 1)
-theme_override_fonts/font = ExtResource("7_63jln")
-theme_override_font_sizes/font_size = 30
-text = "101010101101011010101010101010101010101000000000000000"
-horizontal_alignment = 1
-vertical_alignment = 1
+theme_override_colors/default_color = Color(0.619608, 0.780392, 0.921569, 1)
+theme_override_fonts/normal_font = ExtResource("7_63jln")
+theme_override_font_sizes/normal_font_size = 30
+bbcode_enabled = true
+text = "[center]0000000000000000000000000000000000000000000000000000000000000000[/center]"
+fit_content = true
+scroll_active = false
 
-[node name="ZobristLabel2" type="Label" parent="ZobristInfo/VBoxContainer"]
+[node name="ZobristLabel" type="Label" parent="UI/ZobristInfo/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.411765, 0.411765, 0.411765, 1)
 theme_override_fonts/font = ExtResource("7_63jln")
 theme_override_font_sizes/font_size = 25
-text = "[45134523436246]"
+text = "[0]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GameOverInfo" type="Control" parent="."]
+[node name="GameOverInfo" type="Control" parent="UI"]
 layout_mode = 3
 anchors_preset = 0
 offset_left = 330.0
@@ -140,7 +207,7 @@ offset_right = 1590.0
 offset_bottom = 105.0
 metadata/_edit_group_ = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="GameOverInfo"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/GameOverInfo"]
 layout_mode = 1
 anchors_preset = 14
 anchor_top = 0.5
@@ -150,7 +217,7 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="GameOverLabel" type="Label" parent="GameOverInfo/VBoxContainer"]
+[node name="GameOverLabel" type="Label" parent="UI/GameOverInfo/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("7_63jln")
@@ -159,7 +226,7 @@ text = "Game Over"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GamerOverRreasonLabel" type="Label" parent="GameOverInfo/VBoxContainer"]
+[node name="GamerOverRreasonLabel" type="Label" parent="UI/GameOverInfo/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.411765, 0.411765, 0.411765, 1)
 theme_override_fonts/font = ExtResource("7_63jln")
@@ -170,3 +237,10 @@ vertical_alignment = 1
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 540)
+
+[connection signal="OnGameOver" from="." to="UI" method="OnGameOver"]
+[connection signal="OnGameTurn" from="." to="UI" method="OnGameTurn"]
+[connection signal="pressed" from="UI/ButtonsPanel/VBoxContainer/VBoxContainer2/PlayWhiteButton" to="UI" method="OnPlayWhite"]
+[connection signal="pressed" from="UI/ButtonsPanel/VBoxContainer/VBoxContainer2/PlayBlackButton" to="UI" method="OnPlayBlack"]
+[connection signal="pressed" from="UI/ButtonsPanel/VBoxContainer/VBoxContainer2/PlayAIButton" to="UI" method="OnPlayAI"]
+[connection signal="pressed" from="UI/ButtonsPanel/VBoxContainer/QuitButton" to="UI" method="OnQuit"]

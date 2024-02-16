@@ -4,11 +4,41 @@ using System.Collections.Generic;
 
 public partial class Game : Node2D
 {
-    // label with the last move
+    // game over reasons
 
-    [Export] private Label lastMoveLabel;
-    [Export] private Label zobristLabel;
-    [Export] private Label zobrist2Label;
+    public enum GameOverReason
+    {
+        WhiteMated,
+        BlackMated,
+        Drowned,
+        Repetition
+    }
+
+    // game state machine
+
+    private enum GameState
+    {
+        PlayerWhiteTurn,
+        PlayerBlackTurn,
+        MakeMove,
+        WaitUntilCompleted,
+        NextTurn,
+        Over
+    }
+
+    // ui state machine testing
+
+    private enum BoardGraphicsState
+    {
+        Idle,
+        Dragging,
+        PieceSelected
+    }
+
+    // signals
+
+    [Signal] public delegate void OnGameTurnEventHandler();
+    [Signal] public delegate void OnGameOverEventHandler(GameOverReason gameOverReason);
 
     // board class that contains everything related to the pieces
 
@@ -18,30 +48,30 @@ public partial class Game : Node2D
 
 	private BoardGraphics boardGraphics;
 
+    // ui
+
+    private UI ui;
+
     // selected piece index
 
     private int pieceSelectedIndex = -1; // -1 means nothing selected
     private List<Move> pieceSelectedMoves = null;
+    private Move moveSelected = Move.NullMove;
+    private bool isMoveAnimated = false;
 
-    // ui state machine testing
+    // state of the game and boardUI
 
-    private enum BoardUIState
-    {
-        Idle,
-        Holding,
-        PieceSelected,
-        Animation
-    }
+    private GameState gameState = GameState.NextTurn;
+    private BoardGraphicsState boardUIState = BoardGraphicsState.Idle;
 
-    private BoardUIState boardUIState = BoardUIState.Idle;
+    // Called when the node enters the scene tree for the first time.
 
-	// Called when the node enters the scene tree for the first time.
-
-	public override void _Ready()
+    public override void _Ready()
 	{
 		// get the nodes
 
 		boardGraphics = GetNode<BoardGraphics>("BoardGraphics");
+        ui = GetNode<UI>("UI");
 
 		// init the board and load the fen
 
@@ -52,19 +82,60 @@ public partial class Game : Node2D
 
 		boardGraphics.ConnectToBoard(board);
 
+        // connect the ui to the game
+
+        ui.ConnectToGame(this);
+
 		// update the board graphics
 
 		boardGraphics.UpdateGraphics();
-
-        // testing
-
-        ulong key = ZobristHashing.GetKey(board);
-        zobristLabel.Text = Utils.ConvertULongToBinaryString(key);
-        zobrist2Label.Text = "[" + key + "]";
     }
 
-    private void BoardUIUpdate()
+    // get the board
+
+    public Board GetBoard()
     {
+        return board;
+    }
+
+    // play as color
+
+    public void PlayAsColor(Piece.Color color)
+    {
+        // board reset fen
+
+        board.LoadFenString(Board.StartFEN);
+
+        // set game state to next turn
+
+        gameState = GameState.NextTurn;
+        boardUIState = BoardGraphicsState.Idle;
+
+        // check if white or black
+
+        switch (color)
+        {
+            case Piece.Color.White:
+                boardGraphics.FlipBoard(false);
+                break;
+            case Piece.Color.Black:
+                boardGraphics.FlipBoard(true);
+                break;
+        }
+
+        // reset graphics
+
+        boardGraphics.SelectSquare(-1);
+        boardGraphics.SetHintMoves(null);
+        boardGraphics.UpdateGraphics();
+    }
+
+    // player human
+
+    private bool PlayerHumanUpdateState()
+    {
+        // handle everything related to move selection
+
         // get turn color
 
         Piece.Color turnColor = board.GetTurnColor();
@@ -81,7 +152,7 @@ public partial class Game : Node2D
 
         switch (boardUIState)
         {
-            case BoardUIState.Idle:
+            case BoardGraphicsState.Idle:
                 // the first frame you click
 
                 if (Input.IsActionJustPressed("Select"))
@@ -101,18 +172,22 @@ public partial class Game : Node2D
                             pieceSelectedIndex = squareIndex;
                             pieceSelectedMoves = MoveGeneration.GetLegalMoves(board, squareIndex);
 
+                            // highlight square
+
+                            boardGraphics.HightlightSquare(squareIndex);
+
                             // set hint moves
 
                             boardGraphics.SetHintMoves(pieceSelectedMoves);
 
                             // change state
 
-                            boardUIState = BoardUIState.Holding;
+                            boardUIState = BoardGraphicsState.Dragging;
                         }
                     }
                 }
                 break;
-            case BoardUIState.Holding:
+            case BoardGraphicsState.Dragging:
                 // move the piece selected to the mouse position
 
                 boardGraphics.SetPieceSpritePosition(pieceSelectedIndex, mouse);
@@ -129,54 +204,23 @@ public partial class Game : Node2D
                     {
                         // if the square is a valid move
 
-                        bool isLegalMove = false;
-                        Move selectedMove = Move.NullMove;
-
                         foreach (Move move in pieceSelectedMoves)
                         {
                             if (move.squareTargetIndex == squareIndex)
                             {
-                                isLegalMove = true;
-                                selectedMove = move;
-                                break;
+                                // select the move
+
+                                moveSelected = move;
+                                isMoveAnimated = false;
+
+                                // reset board state
+
+                                boardUIState = BoardGraphicsState.Idle;
+
+                                // move selected
+
+                                return true;
                             }
-                        }
-
-                        // check if legal move
-
-                        if (isLegalMove)
-                        {
-                            // make the move
-
-                            board.MakeMove(selectedMove);
-                            lastMoveLabel.Text = "Last move: " + Utils.FromMoveToString(selectedMove);
-                            ulong key = ZobristHashing.GetKey(board);
-                            zobristLabel.Text = Utils.ConvertULongToBinaryString(key);
-                            zobrist2Label.Text = "[" + key + "]";
-
-                            // disable square selection
-
-                            boardGraphics.SelectSquare(-1);
-
-                            // disable hint moves
-
-                            boardGraphics.SetHintMoves(null);
-
-                            // animate the move
-
-                            boardGraphics.AnimateMove(selectedMove, false, Callable.From(() =>
-                            {
-                                boardGraphics.UpdateGraphics();
-                                boardUIState = BoardUIState.Idle;
-                            }));
-
-                            // change state
-
-                            boardUIState = BoardUIState.Animation;
-
-                            // exit
-
-                            return;
                         }
                     }
 
@@ -190,10 +234,10 @@ public partial class Game : Node2D
 
                     // go to piece selected state
 
-                    boardUIState = BoardUIState.PieceSelected;
+                    boardUIState = BoardGraphicsState.PieceSelected;
                 }
                 break;
-            case BoardUIState.PieceSelected:
+            case BoardGraphicsState.PieceSelected:
                 // the first frame you click
 
                 if (Input.IsActionJustPressed("Select"))
@@ -202,50 +246,23 @@ public partial class Game : Node2D
                     {
                         // if the square is a valid move
 
-                        bool isLegalMove = false;
-                        Move selectedMove = Move.NullMove;
-
                         foreach (Move move in pieceSelectedMoves)
                         {
                             if (move.squareTargetIndex == squareIndex)
                             {
-                                isLegalMove = true;
-                                selectedMove = move;
-                                break;
+                                // select the move
+
+                                moveSelected = move;
+                                isMoveAnimated = true;
+
+                                // reset board state
+
+                                boardUIState = BoardGraphicsState.Idle;
+
+                                // move selected
+
+                                return true;
                             }
-                        }
-
-                        // check if legal move
-
-                        if (isLegalMove)
-                        {
-                            // make the move
-
-                            board.MakeMove(selectedMove);
-                            lastMoveLabel.Text = "Last move: " + Utils.FromMoveToString(selectedMove);
-                            ulong key = ZobristHashing.GetKey(board);
-                            zobristLabel.Text = Utils.ConvertULongToBinaryString(key);
-                            zobrist2Label.Text = "[" + key + "]";
-
-                            // disable hint moves
-
-                            boardGraphics.SetHintMoves(null);
-
-                            // animate the move
-
-                            boardGraphics.AnimateMove(selectedMove, true, Callable.From(() =>
-                            {
-                                boardGraphics.UpdateGraphics();
-                                boardUIState = BoardUIState.Idle;
-                            }));
-
-                            // change state
-
-                            boardUIState = BoardUIState.Animation;
-
-                            // exit
-
-                            return;
                         }
 
                         // if the move is not legal then check if another piece is selected
@@ -263,19 +280,27 @@ public partial class Game : Node2D
                             pieceSelectedIndex = squareIndex;
                             pieceSelectedMoves = MoveGeneration.GetLegalMoves(board, squareIndex);
 
+                            // highlight square
+
+                            boardGraphics.HightlightSquare(squareIndex);
+
                             // set hint moves
 
                             boardGraphics.SetHintMoves(pieceSelectedMoves);
 
                             // change state to holding the piece
 
-                            boardUIState = BoardUIState.Holding;
+                            boardUIState = BoardGraphicsState.Dragging;
 
                             // exit
 
-                            return;
+                            return false;
                         }
                     }
+
+                    // stop highlighting square
+
+                    boardGraphics.HightlightSquare(-1);
 
                     // disable hint moves
 
@@ -283,12 +308,132 @@ public partial class Game : Node2D
 
                     // go back to idle state
 
-                    boardUIState = BoardUIState.Idle;
+                    boardUIState = BoardGraphicsState.Idle;
                 }
                 break;
-            case BoardUIState.Animation:
-                
-                // just wait until the animation is completed
+        }
+
+        // no move selected
+
+        return false;
+    }
+
+    // update game state
+
+    private void UpdateState()
+    {
+        switch (gameState)
+        {
+            case GameState.NextTurn:
+                // emit signal
+
+                EmitSignal(SignalName.OnGameTurn);
+
+                // get turn color
+
+                Piece.Color turnColor = board.GetTurnColor();
+
+                // check if the game is over
+
+                bool isGameOver = false;
+
+                // check if the current player has any moves available
+
+                List<Move> moves = MoveGeneration.GetAllLegalMovesByColor(board, turnColor);
+
+                if (moves.Count == 0)
+                {
+                    if (MoveGeneration.IsKingInCheck(board, turnColor))
+                    {
+                        switch (turnColor)
+                        {
+                            case Piece.Color.White:
+                                EmitSignal(SignalName.OnGameOver, (int)GameOverReason.WhiteMated);
+                                break;
+                            case Piece.Color.Black:
+                                EmitSignal(SignalName.OnGameOver, (int)GameOverReason.BlackMated);
+                                break;
+                        }
+                    } else
+                    {
+                        EmitSignal(SignalName.OnGameOver, (int)GameOverReason.Drowned);
+                    }
+
+                    isGameOver = true;
+                }
+
+                // 3 fold
+
+                if (board.zobristPositionHistory[board.zobristPosition] >= 3)
+                {
+                    EmitSignal(SignalName.OnGameOver, (int)GameOverReason.Repetition);
+                    isGameOver = true;
+                }
+
+                // if the games continues
+
+                if (!isGameOver)
+                {
+                    // next player turn
+
+                    switch (turnColor)
+                    {
+                        case Piece.Color.White:
+                            gameState = GameState.PlayerWhiteTurn;
+                            break;
+                        case Piece.Color.Black:
+                            gameState = GameState.PlayerBlackTurn;
+                            break;
+                    }
+                }
+                else
+                {
+                    gameState = GameState.Over;
+                }
+                break;
+            case GameState.PlayerWhiteTurn:
+            case GameState.PlayerBlackTurn:
+                // player white
+
+                bool isMoveSelected = PlayerHumanUpdateState();
+
+                if (isMoveSelected)
+                {
+                    gameState = GameState.MakeMove;
+                }
+                break;
+            case GameState.MakeMove:
+                // make the move & calculate zobrist
+
+                board.MakeMove(moveSelected);
+
+                // disable highlight square
+
+                boardGraphics.HightlightSquare(-1);
+
+                // disable square selection
+
+                boardGraphics.SelectSquare(-1);
+
+                // disable hint moves
+
+                boardGraphics.SetHintMoves(null);
+
+                // animate the move
+
+                boardGraphics.AnimateMove(moveSelected, isMoveAnimated, Callable.From(() =>
+                {
+                    boardGraphics.UpdateGraphics();
+                    gameState = GameState.NextTurn;
+                }));
+
+                // change state
+
+                gameState = GameState.WaitUntilCompleted;
+                break;
+            case GameState.WaitUntilCompleted:
+                break;
+            case GameState.Over:
                 break;
         }
     }
@@ -297,6 +442,6 @@ public partial class Game : Node2D
 
     public override void _Process(double delta)
 	{
-        BoardUIUpdate();
+        UpdateState();
     }
 }

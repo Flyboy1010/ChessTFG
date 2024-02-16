@@ -17,7 +17,7 @@ public partial class BoardGraphics : Node2D
 
 	[Export] private int squareSize;
 	[Export] private Texture2D piecesTexture;
-    [Export] private Color hintLastMoveColor;
+    [Export] private Color hintLastMoveColor = new Color(0.858f, 0.78f, 0.35f, 0.502f);
     [Export] private Material hintCircleMaterial;
     [Export] private Material hintCircleWithHoleMaterial;
     [Export] private float animationTime = 0.3f;
@@ -41,7 +41,11 @@ public partial class BoardGraphics : Node2D
 
     // selected square
 
-    private int squareSelectedIndex;
+    private int squareSelectedIndex = -1;
+
+    // highlighted square
+
+    private int squareHighlightedIndex = -1;
 
     // tween for animating the pieces
 
@@ -105,6 +109,13 @@ public partial class BoardGraphics : Node2D
         }
 
         return (square.X >= 0 && square.X < 8 && square.Y >= 0 && square.Y < 8);
+    }
+
+    // flip board
+
+    public void FlipBoard(bool isFlipped)
+    {
+        isBoardFlipped = isFlipped;
     }
 
     // create the graphics
@@ -223,6 +234,13 @@ public partial class BoardGraphics : Node2D
     public void SelectSquare(int index)
     {
         squareSelectedIndex = index;
+    }
+
+    // highlight square
+
+    public void HightlightSquare(int index)
+    {
+        squareHighlightedIndex = index;
     }
 
     // play move
@@ -367,6 +385,22 @@ public partial class BoardGraphics : Node2D
 
             DrawRect(new Rect2(new Vector2(si, sj) * squareSize, squareSize, squareSize), hintLastMoveColor);
             DrawRect(new Rect2(new Vector2(ti, tj) * squareSize, squareSize, squareSize), hintLastMoveColor);
+        }
+
+        // square highlighted
+
+        if (squareHighlightedIndex != -1)
+        {
+            int i = squareHighlightedIndex % 8;
+            int j = squareHighlightedIndex / 8;
+
+            if (isBoardFlipped)
+            {
+                i = 7 - i;
+                j = 7 - j;
+            }
+
+            DrawRect(new Rect2(i * squareSize, j * squareSize, squareSize, squareSize), hintLastMoveColor);
         }
 
         // square selected

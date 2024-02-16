@@ -35,6 +35,10 @@ public partial class BoardGraphics : Node2D
 
     private ColorRect[] hintsSprites = new ColorRect[64];
 
+    // color rect indicating that the king is in check
+
+    private ColorRect checkIndicator;
+
     // the size of a piece inside the texture (in pixels)
 
     private Vector2I pieceTextureSize;
@@ -58,6 +62,14 @@ public partial class BoardGraphics : Node2D
         // init
 
         pieceTextureSize = (Vector2I)piecesTexture.GetSize() / new Vector2I(6, 2);
+
+        // check indicator
+
+        checkIndicator = new ColorRect();
+        checkIndicator.Size = new Vector2(squareSize, squareSize);
+        checkIndicator.Color = new Color(0.804f, 0.306f, 0.325f);
+        checkIndicator.Visible = false;
+        AddChild(checkIndicator);
 
         // create the graphics
 
@@ -243,6 +255,31 @@ public partial class BoardGraphics : Node2D
         squareHighlightedIndex = index;
     }
 
+    // checkindicator
+
+    public void SetCheckIndicatorIndex(int index)
+    {
+        if (index != -1)
+        {
+            int i = index % 8;
+            int j = index / 8;
+
+            if (isBoardFlipped)
+            {
+                i = 7 - i;
+                j = 7 - j;
+            }
+
+            checkIndicator.Position = new Vector2(i, j) * squareSize;
+
+            checkIndicator.Visible = true;
+        }
+        else
+        {
+            checkIndicator.Visible = false;
+        }
+    }
+
     // play move
 
     public void AnimateMove(Move move, bool isAnimated, Callable onFinish)
@@ -355,6 +392,27 @@ public partial class BoardGraphics : Node2D
             }
 
             tween.TweenProperty(towerPieceSprite, "position", new Vector2(rook_i + 0.5f, rook_j + 0.5f) * squareSize, animationTime);
+        }
+
+        // TODO: refactor this to be not this messy
+        // testing check indicator
+
+        Piece.Color nextTurnColor = board.GetTurnColor();
+        bool isKingInCheck = MoveGeneration.IsKingInCheck(board, nextTurnColor);
+        if (isKingInCheck)
+        {
+            
+            SetCheckIndicatorIndex(board.FindKing(nextTurnColor));
+            checkIndicator.Visible = true;
+            if (isAnimated)
+            {
+                checkIndicator.Color = new Color(0.804f, 0.306f, 0.325f, 0.0f);
+                tween.TweenProperty(checkIndicator, "color", new Color(0.804f, 0.306f, 0.325f), animationTime);
+            }
+        }
+        else
+        {
+            checkIndicator.Visible = false;
         }
 
         // at the end of the animation update the pieces & call on finish callback

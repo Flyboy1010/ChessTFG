@@ -145,7 +145,7 @@ public class Board
 
         GD.PrintErr("there is no king?");
 
-        return 0;
+        return -1;
     }
 
     // load fen string

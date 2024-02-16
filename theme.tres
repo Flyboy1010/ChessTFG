@@ -1,6 +1,6 @@
 [gd_resource type="Theme" load_steps=7 format=3 uid="uid://4a1keta38hen"]
 
-[ext_resource type="FontFile" uid="uid://c2i0807otfe57" path="res://Assets/Fonts/Quicksand-Medium.ttf" id="1_sstyg"]
+[ext_resource type="FontFile" uid="uid://djqwq0u353i4t" path="res://Assets/Fonts/CourierPrime-Regular.ttf" id="1_cmrku"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ukywy"]
 content_margin_left = 4.0
@@ -40,8 +40,8 @@ bg_color = Color(1, 0.498039, 0.486275, 1)
 corner_detail = 1
 
 [resource]
-default_font = ExtResource("1_sstyg")
-default_font_size = 30
+default_font = ExtResource("1_cmrku")
+default_font_size = 35
 Button/colors/font_color = Color(0.875, 0.875, 0.875, 1)
 Button/colors/font_disabled_color = Color(0.875, 0.875, 0.875, 0.5)
 Button/colors/font_focus_color = Color(0.95, 0.95, 0.95, 1)
@@ -58,8 +58,8 @@ Button/colors/icon_pressed_color = Color(1, 1, 1, 1)
 Button/constants/h_separation = 0
 Button/constants/icon_max_width = 0
 Button/constants/outline_size = 0
-Button/font_sizes/font_size = 30
-Button/fonts/font = ExtResource("1_sstyg")
+Button/font_sizes/font_size = 35
+Button/fonts/font = ExtResource("1_cmrku")
 Button/styles/disabled = SubResource("StyleBoxFlat_ukywy")
 Button/styles/focus = SubResource("StyleBoxEmpty_be1p1")
 Button/styles/hover = SubResource("StyleBoxFlat_v8abe")

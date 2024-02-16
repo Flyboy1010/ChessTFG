@@ -125,6 +125,7 @@ public partial class Game : Node2D
 
         // reset graphics
 
+        boardGraphics.SetCheckIndicatorIndex(-1);
         boardGraphics.SelectSquare(-1);
         boardGraphics.SetHintMoves(null);
         boardGraphics.UpdateGraphics();
@@ -354,7 +355,8 @@ public partial class Game : Node2D
                                 EmitSignal(SignalName.OnGameOver, (int)GameOverReason.BlackMated);
                                 break;
                         }
-                    } else
+                    }
+                    else
                     {
                         EmitSignal(SignalName.OnGameOver, (int)GameOverReason.Drowned);
                     }

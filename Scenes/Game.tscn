@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://diioigr62k7wp"]
+[gd_scene load_steps=10 format=3 uid="uid://diioigr62k7wp"]
 
 [ext_resource type="Script" path="res://Scripts/Game.cs" id="1_ebuse"]
 [ext_resource type="Script" path="res://Scripts/BoardGraphics.cs" id="2_yqws2"]
@@ -6,7 +6,6 @@
 [ext_resource type="Material" uid="uid://dlsj35nvx3d5q" path="res://Materials/CircleMaterial.tres" id="4_yg707"]
 [ext_resource type="Material" uid="uid://citlsk4gvtxuo" path="res://Materials/CircleWithHoleMaterial.tres" id="5_1ckw8"]
 [ext_resource type="Shader" path="res://Shaders/BoardSquares.gdshader" id="6_8nyfd"]
-[ext_resource type="FontFile" uid="uid://c2i0807otfe57" path="res://Assets/Fonts/Quicksand-Medium.ttf" id="7_63jln"]
 [ext_resource type="Script" path="res://Scripts/UI.cs" id="7_lpnj1"]
 [ext_resource type="Theme" uid="uid://4a1keta38hen" path="res://theme.tres" id="7_qn2n2"]
 
@@ -44,7 +43,7 @@ offset_right = 855.0
 offset_bottom = 855.0
 color = Color(0.22, 0.22, 0.22, 1)
 
-[node name="UI" type="Control" parent="." node_paths=PackedStringArray("gameOverLabel", "gameOverReasonLabel", "zobristHashNumberLabel", "zobristHashNumberBitsLabel", "lastMoveLabel")]
+[node name="UI" type="Control" parent="." node_paths=PackedStringArray("gameOverLabel", "gameOverReasonLabel", "zobristHashNumberLabel", "zobristHashNumberBitsLabel", "lastMoveLabel", "evaluationLabel")]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("7_lpnj1")
@@ -53,6 +52,7 @@ gameOverReasonLabel = NodePath("GameOverInfo/VBoxContainer/GamerOverRreasonLabel
 zobristHashNumberLabel = NodePath("ZobristInfo/VBoxContainer/ZobristLabel")
 zobristHashNumberBitsLabel = NodePath("ZobristInfo/VBoxContainer/ZobristBitsLabel")
 lastMoveLabel = NodePath("DebugInfo/VBoxContainer/LastMoveLabel")
+evaluationLabel = NodePath("DebugInfo/VBoxContainer/EvaluationLabel")
 metadata/_edit_group_ = true
 
 [node name="ButtonsPanel" type="Control" parent="UI"]
@@ -118,7 +118,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 1485.0
 offset_top = 120.0
-offset_right = 1800.0
+offset_right = 1905.0
 offset_bottom = 960.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -138,25 +138,22 @@ grow_vertical = 2
 
 [node name="SearchDepthLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
 layout_mode = 2
+theme = ExtResource("7_qn2n2")
 theme_override_colors/font_color = Color(0.803922, 0.305882, 0.32549, 1)
-theme_override_fonts/font = ExtResource("7_63jln")
-theme_override_font_sizes/font_size = 30
 text = "Search depth: 7"
 vertical_alignment = 1
 
 [node name="EvaluationLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
 layout_mode = 2
+theme = ExtResource("7_qn2n2")
 theme_override_colors/font_color = Color(0.960784, 0.639216, 0.356863, 1)
-theme_override_fonts/font = ExtResource("7_63jln")
-theme_override_font_sizes/font_size = 30
 text = "Evaluation: 00.00"
 vertical_alignment = 1
 
 [node name="LastMoveLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
 layout_mode = 2
+theme = ExtResource("7_qn2n2")
 theme_override_colors/font_color = Color(0.717647, 0.584314, 0.870588, 1)
-theme_override_fonts/font = ExtResource("7_63jln")
-theme_override_font_sizes/font_size = 30
 text = "Last move: -"
 vertical_alignment = 1
 
@@ -175,15 +172,18 @@ anchors_preset = 14
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
+offset_left = -105.0
+offset_top = -32.5
+offset_right = 105.0
+offset_bottom = 47.5
 grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
 [node name="ZobristBitsLabel" type="RichTextLabel" parent="UI/ZobristInfo/VBoxContainer"]
 layout_mode = 2
+theme = ExtResource("7_qn2n2")
 theme_override_colors/default_color = Color(0.619608, 0.780392, 0.921569, 1)
-theme_override_fonts/normal_font = ExtResource("7_63jln")
-theme_override_font_sizes/normal_font_size = 30
 bbcode_enabled = true
 text = "[center]0000000000000000000000000000000000000000000000000000000000000000[/center]"
 fit_content = true
@@ -191,9 +191,9 @@ scroll_active = false
 
 [node name="ZobristLabel" type="Label" parent="UI/ZobristInfo/VBoxContainer"]
 layout_mode = 2
+theme = ExtResource("7_qn2n2")
 theme_override_colors/font_color = Color(0.411765, 0.411765, 0.411765, 1)
-theme_override_fonts/font = ExtResource("7_63jln")
-theme_override_font_sizes/font_size = 25
+theme_override_font_sizes/font_size = 30
 text = "[0]"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -219,18 +219,17 @@ alignment = 1
 
 [node name="GameOverLabel" type="Label" parent="UI/GameOverInfo/VBoxContainer"]
 layout_mode = 2
+theme = ExtResource("7_qn2n2")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("7_63jln")
-theme_override_font_sizes/font_size = 30
 text = "Game Over"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="GamerOverRreasonLabel" type="Label" parent="UI/GameOverInfo/VBoxContainer"]
 layout_mode = 2
+theme = ExtResource("7_qn2n2")
 theme_override_colors/font_color = Color(0.411765, 0.411765, 0.411765, 1)
-theme_override_fonts/font = ExtResource("7_63jln")
-theme_override_font_sizes/font_size = 25
+theme_override_font_sizes/font_size = 30
 text = "Black wins by checkmate"
 horizontal_alignment = 1
 vertical_alignment = 1

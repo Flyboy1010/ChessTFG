@@ -7,7 +7,7 @@
 [ext_resource type="Material" uid="uid://citlsk4gvtxuo" path="res://Materials/CircleWithHoleMaterial.tres" id="5_1ckw8"]
 [ext_resource type="Shader" path="res://Shaders/BoardSquares.gdshader" id="6_8nyfd"]
 [ext_resource type="Script" path="res://Scripts/UI.cs" id="7_lpnj1"]
-[ext_resource type="Theme" uid="uid://4a1keta38hen" path="res://theme.tres" id="7_qn2n2"]
+[ext_resource type="Theme" uid="uid://cveacvjfoc7nn" path="res://themeUI.tres" id="8_65nis"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b1cto"]
 shader = ExtResource("6_8nyfd")
@@ -70,17 +70,18 @@ metadata/_edit_group_ = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/ButtonsPanel"]
 layout_mode = 1
-anchors_preset = 7
+anchors_preset = 8
 anchor_left = 0.5
-anchor_top = 1.0
+anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -93.0
-offset_top = -146.0
-offset_right = 93.0
+anchor_bottom = 0.5
+offset_left = -123.0
+offset_top = -168.5
+offset_right = 123.0
+offset_bottom = 168.5
 grow_horizontal = 2
-grow_vertical = 0
-theme_override_constants/separation = 60
+grow_vertical = 2
+theme_override_constants/separation = 53
 alignment = 1
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="UI/ButtonsPanel/VBoxContainer"]
@@ -90,25 +91,31 @@ alignment = 1
 [node name="PlayWhiteButton" type="Button" parent="UI/ButtonsPanel/VBoxContainer/VBoxContainer2"]
 layout_mode = 2
 focus_mode = 0
-theme = ExtResource("7_qn2n2")
+theme = ExtResource("8_65nis")
 text = "Play white"
 
 [node name="PlayBlackButton" type="Button" parent="UI/ButtonsPanel/VBoxContainer/VBoxContainer2"]
 layout_mode = 2
 focus_mode = 0
-theme = ExtResource("7_qn2n2")
+theme = ExtResource("8_65nis")
 text = "Play black"
+
+[node name="PlayHumanButton" type="Button" parent="UI/ButtonsPanel/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("8_65nis")
+text = "Play human"
 
 [node name="PlayAIButton" type="Button" parent="UI/ButtonsPanel/VBoxContainer/VBoxContainer2"]
 layout_mode = 2
 focus_mode = 0
-theme = ExtResource("7_qn2n2")
+theme = ExtResource("8_65nis")
 text = "AI vs AI"
 
 [node name="QuitButton" type="Button" parent="UI/ButtonsPanel/VBoxContainer"]
 layout_mode = 2
 focus_mode = 0
-theme = ExtResource("7_qn2n2")
+theme = ExtResource("8_65nis")
 text = "Quit"
 
 [node name="DebugInfo" type="Control" parent="UI"]
@@ -138,21 +145,21 @@ grow_vertical = 2
 
 [node name="SearchDepthLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("7_qn2n2")
+theme = ExtResource("8_65nis")
 theme_override_colors/font_color = Color(0.803922, 0.305882, 0.32549, 1)
-text = "Search depth: 7"
+text = "Search depth: 4 ply"
 vertical_alignment = 1
 
 [node name="EvaluationLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("7_qn2n2")
+theme = ExtResource("8_65nis")
 theme_override_colors/font_color = Color(0.960784, 0.639216, 0.356863, 1)
-text = "Evaluation: 00.00"
+text = "Evaluation: +00.00"
 vertical_alignment = 1
 
 [node name="LastMoveLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("7_qn2n2")
+theme = ExtResource("8_65nis")
 theme_override_colors/font_color = Color(0.717647, 0.584314, 0.870588, 1)
 text = "Last move: -"
 vertical_alignment = 1
@@ -182,7 +189,7 @@ alignment = 1
 
 [node name="ZobristBitsLabel" type="RichTextLabel" parent="UI/ZobristInfo/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("7_qn2n2")
+theme = ExtResource("8_65nis")
 theme_override_colors/default_color = Color(0.619608, 0.780392, 0.921569, 1)
 bbcode_enabled = true
 text = "[center]0000000000000000000000000000000000000000000000000000000000000000[/center]"
@@ -191,7 +198,7 @@ scroll_active = false
 
 [node name="ZobristLabel" type="Label" parent="UI/ZobristInfo/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("7_qn2n2")
+theme = ExtResource("8_65nis")
 theme_override_colors/font_color = Color(0.411765, 0.411765, 0.411765, 1)
 theme_override_font_sizes/font_size = 30
 text = "[0]"
@@ -202,9 +209,9 @@ vertical_alignment = 1
 layout_mode = 3
 anchors_preset = 0
 offset_left = 330.0
-offset_top = 15.0
+offset_top = 8.0
 offset_right = 1590.0
-offset_bottom = 105.0
+offset_bottom = 98.0
 metadata/_edit_group_ = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/GameOverInfo"]
@@ -219,15 +226,15 @@ alignment = 1
 
 [node name="GameOverLabel" type="Label" parent="UI/GameOverInfo/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("7_qn2n2")
+theme = ExtResource("8_65nis")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-text = "Game Over"
+text = "Game over"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="GamerOverRreasonLabel" type="Label" parent="UI/GameOverInfo/VBoxContainer"]
 layout_mode = 2
-theme = ExtResource("7_qn2n2")
+theme = ExtResource("8_65nis")
 theme_override_colors/font_color = Color(0.411765, 0.411765, 0.411765, 1)
 theme_override_font_sizes/font_size = 30
 text = "Black wins by checkmate"
@@ -237,9 +244,12 @@ vertical_alignment = 1
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 540)
 
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+
 [connection signal="OnGameOver" from="." to="UI" method="OnGameOver"]
 [connection signal="OnGameTurn" from="." to="UI" method="OnGameTurn"]
 [connection signal="pressed" from="UI/ButtonsPanel/VBoxContainer/VBoxContainer2/PlayWhiteButton" to="UI" method="OnPlayWhite"]
 [connection signal="pressed" from="UI/ButtonsPanel/VBoxContainer/VBoxContainer2/PlayBlackButton" to="UI" method="OnPlayBlack"]
+[connection signal="pressed" from="UI/ButtonsPanel/VBoxContainer/VBoxContainer2/PlayHumanButton" to="UI" method="OnPlayHuman"]
 [connection signal="pressed" from="UI/ButtonsPanel/VBoxContainer/VBoxContainer2/PlayAIButton" to="UI" method="OnPlayAI"]
 [connection signal="pressed" from="UI/ButtonsPanel/VBoxContainer/QuitButton" to="UI" method="OnQuit"]

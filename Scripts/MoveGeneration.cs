@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using static Board;
 
 public static class MoveGeneration
@@ -755,6 +756,22 @@ public static class MoveGeneration
         return new List<Move>();
     }
 
+    // get all pseudo legal moves
+
+    public static List<Move> GetAllPseudoLegalMovesByColor(Board board, Piece.Color color)
+    {
+        List<Move> moves = new List<Move>();
+
+        int[] piecesIndices = board.GetPiecesIndices(color).ToArray(); // this because the pieces list is modified by get legal moves function
+
+        foreach (int index in piecesIndices)
+        {
+            moves.AddRange(GetPseudoLegalMoves(board, index));
+        }
+
+        return moves;
+    }
+
     // get legal moves
 
     public static List<Move> GetLegalMoves(Board board, int index)
@@ -799,5 +816,30 @@ public static class MoveGeneration
         }
 
         return moves;
+    }
+
+    // test
+
+    public static int TestPositions(Board board, Piece.Color startingColor, int depth)
+    {
+        if (depth == 0)
+        {
+            return 1;
+        }
+
+        List<Move> moves = GetAllPseudoLegalMovesByColor(board, startingColor);
+
+        int numPositions = 0;
+
+        foreach (Move move in moves)
+        {
+            board.MakeMove(move, true);
+            if (!IsKingInCheck(board, startingColor))
+                numPositions += TestPositions(board, Piece.GetOppositeColor(startingColor), depth - 1);
+            board.UndoMove();
+        }
+
+
+        return numPositions;
     }
 }

@@ -1,6 +1,6 @@
-[gd_resource type="Theme" load_steps=7 format=3 uid="uid://4a1keta38hen"]
+[gd_resource type="Theme" load_steps=7 format=3 uid="uid://cveacvjfoc7nn"]
 
-[ext_resource type="FontFile" uid="uid://djqwq0u353i4t" path="res://Assets/Fonts/CourierPrime-Regular.ttf" id="1_cmrku"]
+[ext_resource type="FontFile" uid="uid://bfwwl3p3ti837" path="res://Assets/Fonts/Rubik-Regular.ttf" id="1_flao6"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ukywy"]
 content_margin_left = 4.0
@@ -30,6 +30,7 @@ content_margin_top = 4.0
 content_margin_right = 20.0
 content_margin_bottom = 4.0
 bg_color = Color(0.235294, 0.235294, 0.235294, 1)
+corner_detail = 1
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2wjon"]
 content_margin_left = 20.0
@@ -40,7 +41,7 @@ bg_color = Color(1, 0.498039, 0.486275, 1)
 corner_detail = 1
 
 [resource]
-default_font = ExtResource("1_cmrku")
+default_font = ExtResource("1_flao6")
 default_font_size = 35
 Button/colors/font_color = Color(0.875, 0.875, 0.875, 1)
 Button/colors/font_disabled_color = Color(0.875, 0.875, 0.875, 0.5)
@@ -59,7 +60,7 @@ Button/constants/h_separation = 0
 Button/constants/icon_max_width = 0
 Button/constants/outline_size = 0
 Button/font_sizes/font_size = 35
-Button/fonts/font = ExtResource("1_cmrku")
+Button/fonts/font = ExtResource("1_flao6")
 Button/styles/disabled = SubResource("StyleBoxFlat_ukywy")
 Button/styles/focus = SubResource("StyleBoxEmpty_be1p1")
 Button/styles/hover = SubResource("StyleBoxFlat_v8abe")

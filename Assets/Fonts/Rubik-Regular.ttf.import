@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://djqwq0u353i4t"
-path="res://.godot/imported/CourierPrime-Regular.ttf-d48fc95d886088b0b3b3e46d1fdbd80e.fontdata"
+uid="uid://bfwwl3p3ti837"
+path="res://.godot/imported/Rubik-Regular.ttf-82a94c064a397a3e3171dca15fa70ed3.fontdata"
 
 [deps]
 
-source_file="res://Assets/Fonts/CourierPrime-Regular.ttf"
-dest_files=["res://.godot/imported/CourierPrime-Regular.ttf-d48fc95d886088b0b3b3e46d1fdbd80e.fontdata"]
+source_file="res://Assets/Fonts/Rubik-Regular.ttf"
+dest_files=["res://.godot/imported/Rubik-Regular.ttf-82a94c064a397a3e3171dca15fa70ed3.fontdata"]
 
 [params]
 
@@ -30,8 +30,9 @@ compress=true
 preload=[{
 "chars": [],
 "glyphs": [],
-"name": "Nueva Configuración",
-"size": Vector2i(16, 0)
+"name": "New Configuration",
+"size": Vector2i(16, 0),
+"variation_embolden": 0.0
 }]
 language_support={}
 script_support={}

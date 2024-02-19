@@ -87,8 +87,8 @@ public partial class UI : Control
 
 		// calculate evaluation
 
-		int evaluation = Evaluation.EvaluateBoard(board);
-		evaluationLabel.Text = "Evaluation: " + (evaluation / 100.0f).ToString("00.00", System.Globalization.CultureInfo.InvariantCulture);
+		int evaluation = Evaluation.EvaluateBoard(board, Piece.Color.White);
+		evaluationLabel.Text = "Evaluation: " + (evaluation / 100.0f).ToString("+00.00;-00.00", System.Globalization.CultureInfo.InvariantCulture);
 	}
 
 	// on play as white
@@ -101,7 +101,7 @@ public partial class UI : Control
 
         gameOverLabel.Visible = false;
         gameOverReasonLabel.Visible = false;
-        evaluationLabel.Text = "Evaluation: 00.00";
+        evaluationLabel.Text = "Evaluation: +00.00";
     }
 
 	// on play as black
@@ -114,14 +114,33 @@ public partial class UI : Control
 
         gameOverLabel.Visible = false;
         gameOverReasonLabel.Visible = false;
+        evaluationLabel.Text = "Evaluation: +00.00";
     }
 
-	// on play ai
+	// on play vs human
 
-	private void OnPlayAI()
+	private void OnPlayHuman()
 	{
+        game.PlayAsColor(Piece.Color.White, true);
 
-	}
+        // hide labels
+
+        gameOverLabel.Visible = false;
+        gameOverReasonLabel.Visible = false;
+        evaluationLabel.Text = "Evaluation: +00.00";
+    }
+
+    // on play ai
+
+    private void OnPlayAI()
+	{
+        game.PlayAsColor(Piece.Color.None);
+
+        // hide labels
+
+        gameOverLabel.Visible = false;
+        gameOverReasonLabel.Visible = false;
+    }
 
 	// on quit
 

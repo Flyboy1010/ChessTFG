@@ -129,6 +129,19 @@ public class Board
         return currentBoardState.GetTurnColor();
     }
 
+    // copy the board
+
+    public Board Copy()
+    {
+        Board board = new Board();
+        Array.Copy(pieces, board.pieces, pieces.Length);
+        board.piecesIndicesWhite.AddRange(piecesIndicesWhite.ToArray());
+        board.piecesIndicesBlack.AddRange(piecesIndicesBlack.ToArray());
+        board.currentBoardState = currentBoardState;
+
+        return board;
+    }
+
     // find king 
 
     public int FindKing(Piece.Color color)

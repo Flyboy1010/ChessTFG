@@ -88,8 +88,8 @@ public partial class Game : Node2D
 
         // audio
 
-        audioStreams.Add("move", GD.Load<AudioStream>("res://Assets/Sounds/move.mp3"));
-        audioStreams.Add("capture", GD.Load<AudioStream>("res://Assets/Sounds/capture.mp3"));
+        audioStreams.Add("move", GD.Load<AudioStream>("res://Assets/Sounds/move.ogg"));
+        audioStreams.Add("capture", GD.Load<AudioStream>("res://Assets/Sounds/capture.ogg"));
 
         // create players
 
@@ -251,9 +251,9 @@ public partial class Game : Node2D
                     isGameOver = true;
                 }
 
-                // 3 fold
+                // 3 fold repetition
 
-                if (board.zobristPositionHistory[board.zobristPosition] >= 3)
+                if (board.GetRepetitions() >= 3)
                 {
                     EmitSignal(SignalName.OnGameOver, (int)GameOverReason.Repetition);
                     isGameOver = true;

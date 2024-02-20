@@ -59,9 +59,54 @@ public static class ZobristHashing
         }
     }
 
-	// get key from board
+    // get pieces keys
 
-	public static ulong GetKey(Board board)
+    public static ulong GetPieceKey(int index, Piece piece)
+    {
+        int pieceIndex = 0;
+
+        switch (piece.color)
+        {
+            case Piece.Color.White:
+                pieceIndex = (int)piece.type - 1;
+                break;
+            case Piece.Color.Black:
+                pieceIndex = (int)piece.type - 1 + 5;
+                break;
+        }
+
+        return pieceKeys[index, pieceIndex];
+    }
+
+    // get short castle keys
+
+    public static ulong GetShortCastleKey(Piece.Color color)
+    {
+        return castlingKeys[(int)color - 1, 0];
+    }
+
+    // get long castle keys
+
+    public static ulong GetLongCastleKey(Piece.Color color)
+    {
+        return castlingKeys[(int)color - 1, 1];
+    }
+
+    // get en passant key
+
+    public static ulong GetEnPassantKey()
+    {
+        return enPassantKey;
+    }
+
+    public static ulong GetTurnColorKey(Piece.Color color)
+    {
+        return turnColorKeys[(int)color - 1];
+    }
+
+    // get key from board
+
+    public static ulong GetKey(Board board)
 	{
 		ulong hashKey = 0;
 

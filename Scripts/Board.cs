@@ -33,8 +33,8 @@ public class Board
 
     // hash map with all the zobrist positions and the times it occured
 
-    public Dictionary<ulong, int> zobristPositionHistory = new Dictionary<ulong, int>();
-    public ulong zobristPosition;
+    private ulong zobrist;
+    private Dictionary<ulong, int> zobristHistory = new Dictionary<ulong, int>();
 
     // current state
 
@@ -129,6 +129,25 @@ public class Board
         return currentBoardState.GetTurnColor();
     }
 
+    // get zobrist
+
+    public ulong GetZobrist()
+    {
+        return zobrist;
+    }
+
+    // get repetitions
+
+    public int GetRepetitions()
+    {
+        if (zobristHistory.ContainsKey(zobrist))
+        {
+            return zobristHistory[zobrist];
+        }
+
+        return 0;
+    }
+
     // copy the board
 
     public Board Copy()
@@ -169,7 +188,7 @@ public class Board
 
         boardStates.Clear();
         moves.Clear();
-        zobristPositionHistory.Clear();
+        zobristHistory.Clear();
 
         // split fen string
 
@@ -281,8 +300,8 @@ public class Board
 
         // zobrist position
 
-        zobristPosition = ZobristHashing.GetKey(this);
-        zobristPositionHistory[zobristPosition] = 1;
+        zobrist = ZobristHashing.GetKey(this);
+        zobristHistory[zobrist] = 1;
     }
 
     // make move
@@ -433,15 +452,15 @@ public class Board
 
         if (!isTesting)
         {
-            zobristPosition = ZobristHashing.GetKey(this);
+            zobrist = ZobristHashing.GetKey(this);
 
-            if (zobristPositionHistory.TryGetValue(zobristPosition, out int count))
+            if (zobristHistory.ContainsKey(zobrist))
             {
-                zobristPositionHistory[zobristPosition] = count + 1;
+                zobristHistory[zobrist]++;
             }
             else
             {
-                zobristPositionHistory[zobristPosition] = 1;
+                zobristHistory[zobrist] = 1;
             }
         }
     }

@@ -79,7 +79,7 @@ public partial class UI : Control
 
 		// zobrist 
 
-		ulong zobristKey = board.zobristPosition;
+		ulong zobristKey = board.GetZobrist();
 		zobristHashNumberLabel.Text = "[" + zobristKey + "]";
 		string zobristKeyString = Utils.ConvertULongToBinaryString(zobristKey);
 		string zobristKeyStringColored = zobristKeyString.Replace("1", "[color=cd4e53]1[/color]");

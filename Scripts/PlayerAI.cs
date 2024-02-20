@@ -8,21 +8,31 @@ public class PlayerAI : Player
 
     private Board board;
 
+    // search
+
+    private Search search;
+
+    // move selected
+
     private Move moveSelected = Move.NullMove;
     private bool moveFound = false;
 
     // ctor
 
-    public PlayerAI(Board board)
+    public PlayerAI(Board board, Piece.Color color)
     {
         // init
 
         this.board = board;
+        search = new Search(4, color);
     }
 
     public override void NotifyTurnToMove()
     {
         moveFound = false;
+        Board boardCopy = board.Copy();
+        search.SetBoard(boardCopy);
+        search.onComplete += OnSearchCompleted;
 
         // Start a new Task to calculate the best move asynchronously
 
@@ -39,9 +49,7 @@ public class PlayerAI : Player
         // Make sure to handle synchronization if needed
 
         // Thread.Sleep(2000);
-        Board newBoard = board.Copy();
-        Search search = new Search(newBoard, newBoard.GetTurnColor());
-        search.onComplete += OnSearchCompleted;
+        
         search.StartSearch();
     }
 

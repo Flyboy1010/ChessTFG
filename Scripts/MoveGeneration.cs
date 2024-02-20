@@ -796,7 +796,7 @@ public static class MoveGeneration
 
             // undo the move
 
-            board.UndoMove();
+            board.UndoMove(true);
         }
 
         return legalMoves;
@@ -836,7 +836,7 @@ public static class MoveGeneration
             board.MakeMove(move, true);
             if (!IsKingInCheck(board, startingColor))
                 numPositions += TestPositions(board, Piece.GetOppositeColor(startingColor), depth - 1);
-            board.UndoMove();
+            board.UndoMove(true);
         }
 
 

@@ -10,6 +10,8 @@ public class Search
     private const int negativeInfinity = -positiveInfinity;
     private const int mateScore = 100000;
 
+    private const int ttSizeInMb = 64;
+
     // on search complete action
 
     public event System.Action<Move> onComplete;
@@ -18,6 +20,10 @@ public class Search
 
 	private Board board;
 
+    // depth to search
+
+    private int targetDepth;
+
     // color
 
     private Piece.Color color;
@@ -25,17 +31,33 @@ public class Search
 	// best move found
 
 	private Move bestMoveFound;
-	private int bestMoveEval = negativeInfinity;
+	private int bestEvalFound = negativeInfinity;
+
+    // transposition table
+
+    private TranspositionTable tt;
 
     // ctor
 
-    public Search(Board board, Piece.Color color)
+    public Search(int depth, Piece.Color color)
 	{
-		// init
+        // init
 
-		this.board = board;
+        targetDepth = depth;
         this.color = color;
+
+        // transposition table
+
+        int sizeInEntries = (ttSizeInMb * 1024 * 1024) / TranspositionTable.Entry.GetSize();
+        tt = new TranspositionTable(sizeInEntries);
 	}
+
+    // set board
+
+    public void SetBoard(Board board)
+    {
+        this.board = board;
+    }
 
 	// get best move
 
@@ -54,7 +76,7 @@ public class Search
         
         // do the search
 
-		int eval = SearchMoves(4, 0, negativeInfinity, positiveInfinity);
+		int eval = SearchMoves(targetDepth, 0, negativeInfinity, positiveInfinity);
 
         //// check if mate score
 
@@ -105,7 +127,7 @@ public class Search
 
         // sort
 
-        SortMoves(board, moves, board.GetTurnColor());
+        SortMoves(moves, board.GetTurnColor());
 
         // calculate eval
 
@@ -113,7 +135,7 @@ public class Search
         {
             board.MakeMove(move, true);
             evaluation = -QuiescenceSearch(-beta, -alpha);
-            board.UndoMove();
+            board.UndoMove(true);
 
             if (evaluation >= beta) // Beta cutoff
             {
@@ -130,11 +152,28 @@ public class Search
 
     public int SearchMoves(int depth, int plyFromRoot, int alpha, int beta)
     {
+        // check the transposition table
+
+        ulong zobrist = board.GetZobrist();
+        int ttVal = tt.Lookup(zobrist, depth, alpha, beta);
+        if (ttVal != TranspositionTable.lookupFailed)
+        {
+            if (plyFromRoot == 0)
+            {
+                TranspositionTable.Entry tEntry = tt.GetEntry(zobrist);
+                bestMoveFound = tEntry.move;
+                bestEvalFound = tEntry.value;
+            }
+
+            return ttVal;
+        }
+
         //
 
         if (depth == 0)
         {
-            return QuiescenceSearch(alpha, beta);
+            int result = QuiescenceSearch(alpha, beta);
+            return result;
         }
 
         // check checkmate
@@ -145,45 +184,57 @@ public class Search
         {
             if (MoveGeneration.IsKingInCheck(board, board.GetTurnColor()))
             {
-                return -mateScore + plyFromRoot;
+                int result = -mateScore + plyFromRoot;
+                return result;
             }
+
+            // stale mate
 
             return 0;
         }
 
-        SortMoves(board, moves, board.GetTurnColor());
+        SortMoves(moves, board.GetTurnColor());
 
         // calculate eval
+
+        TranspositionTable.NodeType nodeType = TranspositionTable.NodeType.UpperBound;
+        Move bestMoveInThisPosition = Move.NullMove;
 
         foreach (Move move in moves)
         {
             board.MakeMove(move, true);
             int evaluation = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
-            board.UndoMove();
+            board.UndoMove(true);
 
             if (evaluation >= beta) // Beta cutoff
             {
+                tt.Store(zobrist, depth, beta, TranspositionTable.NodeType.LowerBound, move);
                 return beta;
             }
 
             if (evaluation > alpha)
             {
+                nodeType = TranspositionTable.NodeType.Exact;
+                bestMoveInThisPosition = move;
+
+                alpha = evaluation;
+
                 if (plyFromRoot == 0)
                 {
                     bestMoveFound = move;
-                    bestMoveEval = evaluation;
+                    bestEvalFound = evaluation;
                 }
             }
-
-            alpha = Math.Max(alpha, evaluation); // Update alpha
         }
+
+        tt.Store(zobrist, depth, alpha, nodeType, bestMoveInThisPosition);
 
         return alpha;
     }
 
     // sort moves
 
-    private void SortMoves(Board board, List<Move> moves, Piece.Color color)
+    private void SortMoves(List<Move> moves, Piece.Color color)
     {
         int[] moveScore = new int[moves.Count];
 
@@ -200,7 +251,6 @@ public class Search
             }
             else
             {
-                // Piece.Color color = moves[i].pieceSource.color;
                 int indexSource = color == Piece.Color.White ? moves[i].squareSourceIndex : 63 - moves[i].squareSourceIndex;
                 int indexTarget = color == Piece.Color.White ? moves[i].squareTargetIndex : 63 - moves[i].squareTargetIndex;
 

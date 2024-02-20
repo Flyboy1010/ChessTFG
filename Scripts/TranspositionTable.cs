@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Reflection.Metadata;
 
 public class TranspositionTable
 {
@@ -43,6 +44,14 @@ public class TranspositionTable
 		entries = new Entry[size];
 	}
 
+	// get entry
+
+	public Entry GetEntry(ulong key)
+	{
+        int index = (int)(key % (ulong)entries.Length);
+		return entries[index];
+    }
+
 	// store entry
 
 	public void Store(ulong key, int depth, int value, NodeType nodeType, Move move)
@@ -50,6 +59,7 @@ public class TranspositionTable
 		// just replace 
 
 		int index = (int)(key % (ulong)entries.Length);
+
 		entries[index] = new Entry()
 		{
 			key = key,
@@ -77,7 +87,23 @@ public class TranspositionTable
 
 			if (entry.depth >= depth)
 			{
-
+				switch (entry.nodeType)
+				{
+					case NodeType.Exact:
+						return entry.value;
+					case NodeType.LowerBound:
+						if (entry.value >= beta)
+						{
+							return entry.value;
+						}
+						break;
+					case NodeType.UpperBound:
+						if (entry.value <= alpha)
+						{
+							return entry.value;
+						}
+						break;
+				}
 			}
 		}
 

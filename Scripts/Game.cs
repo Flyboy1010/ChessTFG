@@ -95,7 +95,7 @@ public partial class Game : Node2D
 
         playerWhite = new PlayerHuman(board, boardGraphics);
         playerWhite.onMoveChosen += OnMoveChosen;
-        playerBlack = new PlayerAI(board);
+        playerBlack = new PlayerAI(board, Piece.Color.Black);
         playerBlack.onMoveChosen += OnMoveChosen;
     }
 
@@ -181,17 +181,17 @@ public partial class Game : Node2D
         {
             case Piece.Color.White:
                 playerWhite = new PlayerHuman(board, boardGraphics);
-                playerBlack = areBothHumans ? new PlayerHuman(board, boardGraphics) : new PlayerAI(board);
+                playerBlack = areBothHumans ? new PlayerHuman(board, boardGraphics) : new PlayerAI(board, Piece.Color.Black);
                 boardGraphics.FlipBoard(false);
                 break;
             case Piece.Color.Black:
-                playerWhite = areBothHumans ? new PlayerHuman(board, boardGraphics) : new PlayerAI(board);
+                playerWhite = areBothHumans ? new PlayerHuman(board, boardGraphics) : new PlayerAI(board, Piece.Color.White);
                 playerBlack = new PlayerHuman(board, boardGraphics);
                 boardGraphics.FlipBoard(true);
                 break;
             case Piece.Color.None:
-                playerWhite = new PlayerAI(board);
-                playerBlack = new PlayerAI(board);
+                playerWhite = new PlayerAI(board, Piece.Color.White);
+                playerBlack = new PlayerAI(board, Piece.Color.Black);
                 break;
         }
 

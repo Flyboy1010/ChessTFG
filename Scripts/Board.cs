@@ -157,6 +157,7 @@ public class Board
         board.piecesIndicesWhite.AddRange(piecesIndicesWhite.ToArray());
         board.piecesIndicesBlack.AddRange(piecesIndicesBlack.ToArray());
         board.currentBoardState = currentBoardState;
+        board.zobrist = zobrist;
 
         return board;
     }
@@ -450,10 +451,10 @@ public class Board
 
         // zobrist hashing
 
+        zobrist = ZobristHashing.GetKey(this);
+
         if (!isTesting)
         {
-            zobrist = ZobristHashing.GetKey(this);
-
             if (zobristHistory.ContainsKey(zobrist))
             {
                 zobristHistory[zobrist]++;
@@ -467,7 +468,7 @@ public class Board
 
     // undoes the last move
 
-    public void UndoMove()
+    public void UndoMove(bool isTesting = false)
     {
         if (boardStates.Count > 0)
         {
@@ -536,6 +537,25 @@ public class Board
                     });
                     break;
             }
+
+            // zobrist hashing
+
+            if (!isTesting)
+            {
+                if (zobristHistory.TryGetValue(zobrist, out int count))
+                {
+                    if (count - 1 <= 0)
+                    {
+                        zobristHistory.Remove(zobrist);
+                    }
+                    else
+                    {
+                        zobristHistory[zobrist] = count - 1;
+                    }
+                }
+            }
+
+            zobrist = ZobristHashing.GetKey(this);
         }
     }
 }

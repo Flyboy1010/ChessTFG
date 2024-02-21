@@ -147,7 +147,7 @@ grow_vertical = 2
 layout_mode = 2
 theme = ExtResource("8_65nis")
 theme_override_colors/font_color = Color(0.803922, 0.305882, 0.32549, 1)
-text = "Search depth: 4 ply"
+text = "Search depth: 5"
 vertical_alignment = 1
 
 [node name="EvaluationLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]

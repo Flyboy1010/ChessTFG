@@ -1,7 +1,5 @@
 using Godot;
 using System;
-using System.Net.NetworkInformation;
-using System.Reflection;
 
 public static class PieceSquareTables
 {
@@ -76,6 +74,6 @@ public static class PieceSquareTables
         -20,-30,-30,-40,-40,-30,-30,-20,
         -10,-20,-20,-20,-20,-20,-20,-10,
          20, 20,  0,  0,  0,  0, 20, 20,
-         20, 30, 10,  0,  0, 10, 40, 20
+         20, 30, 10,  0,  0, 10, 30, 20
     };
 }

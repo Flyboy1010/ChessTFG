@@ -19,12 +19,12 @@ public class PlayerAI : Player
 
     // ctor
 
-    public PlayerAI(Board board, Piece.Color color)
+    public PlayerAI(Board board)
     {
         // init
 
         this.board = board;
-        search = new Search(4, color);
+        search = new Search(5);
     }
 
     public override void NotifyTurnToMove()

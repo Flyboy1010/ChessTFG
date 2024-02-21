@@ -24,10 +24,6 @@ public class Search
 
     private int targetDepth;
 
-    // color
-
-    private Piece.Color color;
-
 	// best move found
 
 	private Move bestMoveFound;
@@ -39,12 +35,11 @@ public class Search
 
     // ctor
 
-    public Search(int depth, Piece.Color color)
+    public Search(int depth)
 	{
         // init
 
         targetDepth = depth;
-        this.color = color;
 
         // transposition table
 
@@ -78,18 +73,18 @@ public class Search
 
 		int eval = SearchMoves(targetDepth, 0, negativeInfinity, positiveInfinity);
 
-        //// check if mate score
+        // check if mate score
 
-        //if (Math.Abs(eval) >= mateScore - 1000)
-        //{
-        //    int numPlyToMate = Math.Abs(eval - mateScore);
-        //    int numMovesToMate = (int)Math.Ceiling(numPlyToMate / 2f);
-        //    GD.Print("Checkmate in " + numMovesToMate + " moves");
-        //}
-        //else
-        //{
-        //    GD.Print(eval / 100.0f);
-        //}
+        if (Math.Abs(eval) >= mateScore - 1000)
+        {
+            int numPlyToMate = Math.Abs(eval - mateScore);
+            int numMovesToMate = (int)Math.Ceiling(numPlyToMate / 2f);
+            GD.Print("Checkmate in " + numPlyToMate + " moves");
+        }
+        else
+        {
+            GD.Print(eval / 100.0f);
+        }
 
         // on search complete
 
@@ -102,7 +97,7 @@ public class Search
     {
         // evaluate board
 
-        int evaluation = Evaluation.EvaluateBoard(board, color);
+        int evaluation = Evaluation.EvaluateBoard(board, board.GetTurnColor());
 
         if (evaluation >= beta) // Beta cutoff
         {
@@ -172,6 +167,7 @@ public class Search
 
         if (depth == 0)
         {
+            //return Evaluation.EvaluateBoard(board, board.GetTurnColor());
             int result = QuiescenceSearch(alpha, beta);
             return result;
         }
@@ -251,8 +247,8 @@ public class Search
             }
             else
             {
-                int indexSource = color == Piece.Color.White ? moves[i].squareSourceIndex : 63 - moves[i].squareSourceIndex;
-                int indexTarget = color == Piece.Color.White ? moves[i].squareTargetIndex : 63 - moves[i].squareTargetIndex;
+                int indexSource = color == Piece.Color.White ? 63 - moves[i].squareSourceIndex : moves[i].squareSourceIndex;
+                int indexTarget = color == Piece.Color.White ? 63 - moves[i].squareTargetIndex : moves[i].squareTargetIndex;
 
                 switch (pieceTypeSource)
                 {

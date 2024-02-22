@@ -278,7 +278,7 @@ public static class MoveGeneration
 
     // generate knight moves
 
-    private static List<Move> GenerateKnightMoves(Board board, int index)
+    private static List<Move> GenerateKnightMoves(Board board, int index, bool onlyCaptures = false)
     {
         List<Move> moves = new List<Move>();
 
@@ -290,16 +290,22 @@ public static class MoveGeneration
 
             // if the square is empty or the pieces color are diferent then add the move to the list
 
-            if (targetPiece.type == Piece.Type.None || targetPiece.color != piece.color)
+            if (targetPiece.type == Piece.Type.None)
             {
-                Move move = new Move();
-                move.squareSourceIndex = index;
-                move.squareTargetIndex = targetIndex;
-                move.pieceSource = piece;
-                move.pieceTarget = targetPiece;
-
-                moves.Add(move);
+                if (onlyCaptures)
+                    continue;
             }
+
+            if (targetPiece.color == piece.color)
+                continue;
+
+            moves.Add(new Move()
+            {
+                squareSourceIndex = index,
+                squareTargetIndex = targetIndex,
+                pieceSource = piece,
+                pieceTarget = targetPiece
+            });
         }
 
         return moves;
@@ -307,7 +313,7 @@ public static class MoveGeneration
 
     // generate sliding moves (for bishop rook & queen)
 
-    private static List<Move> GenerateSlidingMoves(Board board, int index)
+    private static List<Move> GenerateSlidingMoves(Board board, int index, bool onlyCaptures = false)
     {
         List<Move> moves = new List<Move>();
 
@@ -326,25 +332,30 @@ public static class MoveGeneration
 
                 Piece targetPiece = board.GetPiece(targetIndex);
 
-                // construct move
-
-                Move move = new Move();
-                move.squareSourceIndex = index;
-                move.squareTargetIndex = targetIndex;
-                move.pieceSource = piece;
-                move.pieceTarget = targetPiece;
-
-                // check pieces in the path
-
                 if (targetPiece.type == Piece.Type.None)
                 {
-                    moves.Add(move);
+                    if (onlyCaptures)
+                        continue;
+
+                    moves.Add(new Move()
+                    {
+                        squareSourceIndex = index,
+                        squareTargetIndex = targetIndex,
+                        pieceSource = piece,
+                        pieceTarget = targetPiece
+                    });
                 }
                 else
                 {
                     if (targetPiece.color != piece.color)
-                    {
-                        moves.Add(move);
+                    { 
+                        moves.Add(new Move()
+                        {
+                            squareSourceIndex = index,
+                            squareTargetIndex = targetIndex,
+                            pieceSource = piece,
+                            pieceTarget = targetPiece
+                        });
                     }
 
                     break;
@@ -357,7 +368,7 @@ public static class MoveGeneration
 
     // generate pawn moves
 
-    private static List<Move> GeneratePawnMoves(Board board, int index)
+    private static List<Move> GeneratePawnMoves(Board board, int index, bool onlyCaptures = false)
     {
         List<Move> moves = new List<Move>();
 
@@ -368,18 +379,46 @@ public static class MoveGeneration
         int i = index % 8;
         int j = index / 8;
 
-        // check if the pawn is white or black
+        // if just captures ignore pushes and double pushes
 
-        switch (piece.color)
+        if (!onlyCaptures)
         {
-            case Piece.Color.White:
-                // double push
+            // check if the pawn is white or black
 
-                if (j == 6)
-                {
-                    for (int jj = 0; jj < 2; jj++)
+            switch (piece.color)
+            {
+                case Piece.Color.White:
+                    // double push
+
+                    if (j == 6)
                     {
-                        int targetIndex = index + (jj + 1) * directionOffsets[(int)Direction.Up];
+                        for (int jj = 0; jj < 2; jj++)
+                        {
+                            int targetIndex = index + (jj + 1) * directionOffsets[(int)Direction.Up];
+                            Piece targetPiece = board.GetPiece(targetIndex);
+
+                            if (targetPiece.type == Piece.Type.None)
+                            {
+                                moves.Add(new Move
+                                {
+                                    squareSourceIndex = index,
+                                    squareTargetIndex = targetIndex,
+                                    pieceSource = piece,
+                                    pieceTarget = targetPiece,
+                                    flags = (jj == 0) ? Move.Flags.None : Move.Flags.DoublePush
+                                });
+                            }
+                            else
+                            {
+                                // if there is a piece in between then you cant double push
+
+                                break;
+                            }
+                        }
+                    }
+                    else if (j < 6 && j > 0) // single push
+                    {
+                        int targetIndex = index + directionOffsets[(int)Direction.Up];
                         Piece targetPiece = board.GetPiece(targetIndex);
 
                         if (targetPiece.type == Piece.Type.None)
@@ -390,45 +429,45 @@ public static class MoveGeneration
                                 squareTargetIndex = targetIndex,
                                 pieceSource = piece,
                                 pieceTarget = targetPiece,
-                                flags = (jj == 0) ? Move.Flags.None : Move.Flags.DoublePush
+                                flags = (j == 1) ? Move.Flags.Promotion : Move.Flags.None,
+                                promotionPieceType = board.PromotionPieceType
                             });
                         }
-                        else
-                        {
-                            // if there is a piece in between then you cant double push
+                    }
 
-                            break;
+                    break;
+                case Piece.Color.Black:
+                    // double push
+
+                    if (j == 1)
+                    {
+                        for (int jj = 0; jj < 2; jj++)
+                        {
+                            int targetIndex = index + (jj + 1) * directionOffsets[(int)Direction.Down];
+                            Piece targetPiece = board.GetPiece(targetIndex);
+
+                            if (targetPiece.type == Piece.Type.None)
+                            {
+                                moves.Add(new Move
+                                {
+                                    squareSourceIndex = index,
+                                    squareTargetIndex = targetIndex,
+                                    pieceSource = piece,
+                                    pieceTarget = targetPiece,
+                                    flags = (jj == 0) ? Move.Flags.None : Move.Flags.DoublePush
+                                });
+                            }
+                            else
+                            {
+                                // if there is a piece in between then you cant double push
+
+                                break;
+                            }
                         }
                     }
-                }
-                else if (j < 6 && j > 0) // single push
-                {
-                    int targetIndex = index + directionOffsets[(int)Direction.Up];
-                    Piece targetPiece = board.GetPiece(targetIndex);
-
-                    if (targetPiece.type == Piece.Type.None)
+                    else if (j > 1 && j < 7) // single push
                     {
-                        moves.Add(new Move
-                        {
-                            squareSourceIndex = index,
-                            squareTargetIndex = targetIndex,
-                            pieceSource = piece,
-                            pieceTarget = targetPiece,
-                            flags = (j == 1) ? Move.Flags.Promotion : Move.Flags.None,
-                            promotionPieceType = board.PromotionPieceType
-                        });
-                    }
-                }
-
-                break;
-            case Piece.Color.Black:
-                // double push
-
-                if (j == 1)
-                {
-                    for (int jj = 0; jj < 2; jj++)
-                    {
-                        int targetIndex = index + (jj + 1) * directionOffsets[(int)Direction.Down];
+                        int targetIndex = index + directionOffsets[(int)Direction.Down];
                         Piece targetPiece = board.GetPiece(targetIndex);
 
                         if (targetPiece.type == Piece.Type.None)
@@ -439,36 +478,13 @@ public static class MoveGeneration
                                 squareTargetIndex = targetIndex,
                                 pieceSource = piece,
                                 pieceTarget = targetPiece,
-                                flags = (jj == 0) ? Move.Flags.None : Move.Flags.DoublePush
+                                flags = (j == 6) ? Move.Flags.Promotion : Move.Flags.None,
+                                promotionPieceType = board.PromotionPieceType
                             });
                         }
-                        else
-                        {
-                            // if there is a piece in between then you cant double push
-
-                            break;
-                        }
                     }
-                }
-                else if (j > 1 && j < 7) // single push
-                {
-                    int targetIndex = index + directionOffsets[(int)Direction.Down];
-                    Piece targetPiece = board.GetPiece(targetIndex);
-
-                    if (targetPiece.type == Piece.Type.None)
-                    {
-                        moves.Add(new Move
-                        {
-                            squareSourceIndex = index,
-                            squareTargetIndex = targetIndex,
-                            pieceSource = piece,
-                            pieceTarget = targetPiece,
-                            flags = (j == 6) ? Move.Flags.Promotion : Move.Flags.None,
-                            promotionPieceType = board.PromotionPieceType
-                        });
-                    }
-                }
-                break;
+                    break;
+            }
         }
 
         // captures moves
@@ -591,7 +607,7 @@ public static class MoveGeneration
 
     // generate king moves
 
-    private static List<Move> GenerateKingMoves(Board board, int index)
+    private static List<Move> GenerateKingMoves(Board board, int index, bool onlyCaptures = false)
     {
         List<Move> moves = new List<Move>();
 
@@ -605,17 +621,28 @@ public static class MoveGeneration
         {
             Piece targetPiece = board.GetPiece(targetIndex);
 
-            if (targetPiece.type == Piece.Type.None || targetPiece.color != piece.color)
+            if (targetPiece.type == Piece.Type.None)
             {
-                moves.Add(new Move
-                {
-                    squareSourceIndex = index,
-                    squareTargetIndex = targetIndex,
-                    pieceSource = piece,
-                    pieceTarget = targetPiece
-                });
+                if (onlyCaptures)
+                    continue;
             }
+
+            if (targetPiece.color == piece.color)
+                continue;
+
+            moves.Add(new Move()
+            {
+                squareSourceIndex = index,
+                squareTargetIndex = targetIndex,
+                pieceSource = piece,
+                pieceTarget = targetPiece
+            });
         }
+
+        // just captures
+
+        if (onlyCaptures)
+            return moves;
 
         // castling moves
 
@@ -735,22 +762,22 @@ public static class MoveGeneration
 
     // generate pseudo legal moves
 
-    public static List<Move> GetPseudoLegalMoves(Board board, int index)
+    public static List<Move> GetPseudoLegalMoves(Board board, int index, bool onlyCaptures = false)
     {
         Piece piece = board.GetPiece(index);
 
         switch (piece.type)
         {
             case Piece.Type.Pawn:
-                return GeneratePawnMoves(board, index);
+                return GeneratePawnMoves(board, index, onlyCaptures);
             case Piece.Type.Knight:
-                return GenerateKnightMoves(board, index);
+                return GenerateKnightMoves(board, index, onlyCaptures);
             case Piece.Type.Bishop:
             case Piece.Type.Queen:
             case Piece.Type.Rook:
-                return GenerateSlidingMoves(board, index);
+                return GenerateSlidingMoves(board, index, onlyCaptures);
             case Piece.Type.King:
-                return GenerateKingMoves(board, index);
+                return GenerateKingMoves(board, index, onlyCaptures);
         }
 
         return new List<Move>();
@@ -758,7 +785,7 @@ public static class MoveGeneration
 
     // get all pseudo legal moves
 
-    public static List<Move> GetAllPseudoLegalMovesByColor(Board board, Piece.Color color)
+    public static List<Move> GetAllPseudoLegalMovesByColor(Board board, Piece.Color color, bool onlyCaptures = false)
     {
         List<Move> moves = new List<Move>();
 
@@ -766,7 +793,7 @@ public static class MoveGeneration
 
         foreach (int index in piecesIndices)
         {
-            moves.AddRange(GetPseudoLegalMoves(board, index));
+            moves.AddRange(GetPseudoLegalMoves(board, index, onlyCaptures));
         }
 
         return moves;
@@ -774,10 +801,10 @@ public static class MoveGeneration
 
     // get legal moves
 
-    public static List<Move> GetLegalMoves(Board board, int index)
+    public static List<Move> GetLegalMoves(Board board, int index, bool onlyCaptures = false)
     {
         List<Move> legalMoves = new List<Move>();
-        List<Move> pseudoLegalMoves = GetPseudoLegalMoves(board, index);
+        List<Move> pseudoLegalMoves = GetPseudoLegalMoves(board, index, onlyCaptures);
 
         Piece piece = board.GetPiece(index);
 
@@ -804,7 +831,7 @@ public static class MoveGeneration
 
     // get all legal moves
 
-    public static List<Move> GetAllLegalMovesByColor(Board board, Piece.Color color)
+    public static List<Move> GetAllLegalMovesByColor(Board board, Piece.Color color, bool onlyCaptures = false)
     {
         List<Move> moves = new List<Move>();
 
@@ -812,7 +839,7 @@ public static class MoveGeneration
 
         foreach (int index in piecesIndices)
         {
-            moves.AddRange(GetLegalMoves(board, index));
+            moves.AddRange(GetLegalMoves(board, index, onlyCaptures));
         }
 
         return moves;

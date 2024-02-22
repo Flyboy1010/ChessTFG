@@ -48,7 +48,7 @@ public static class Evaluation
 
         foreach (int index in board.GetPiecesIndices(color))
         {
-            int colorIndex = color == Piece.Color.White ? 63 - index : index;
+            int colorIndex = color == Piece.Color.White ? index : 63 - index;
 
             Piece piece = board.GetPiece(index);
 

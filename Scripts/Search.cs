@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 public class Search
 {
@@ -68,23 +69,30 @@ public class Search
         // prepare the search
 
 		bestMoveFound = Move.NullMove;
-        
+
         // do the search
 
-		int eval = SearchMoves(targetDepth, 0, negativeInfinity, positiveInfinity);
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        int eval = SearchMoves(targetDepth, 0, negativeInfinity, positiveInfinity);
+
+        stopwatch.Stop();
+
+        GD.Print("Time: " + stopwatch.ElapsedMilliseconds);
 
         // check if mate score
 
-        if (Math.Abs(eval) >= mateScore - 1000)
-        {
-            int numPlyToMate = Math.Abs(eval - mateScore);
-            int numMovesToMate = (int)Math.Ceiling(numPlyToMate / 2f);
-            GD.Print("Checkmate in " + numPlyToMate + " moves");
-        }
-        else
-        {
-            GD.Print(eval / 100.0f);
-        }
+        //if (Math.Abs(eval) >= mateScore - 1000)
+        //{
+        //    int numPlyToMate = Math.Abs(eval - mateScore);
+        //    int numMovesToMate = (int)Math.Ceiling(numPlyToMate / 2f);
+        //    GD.Print("Checkmate in " + numPlyToMate + " moves");
+        //}
+        //else
+        //{
+        //    GD.Print(eval / 100.0f);
+        //}
 
         // on search complete
 
@@ -106,19 +114,9 @@ public class Search
 
         alpha = Math.Max(alpha, evaluation); // Update alpha
 
-        // get moves
+        // get moves just captures
 
-        List<Move> moves = MoveGeneration.GetAllLegalMovesByColor(board, board.GetTurnColor());
-
-        // remove all non captures
-
-        int n = moves.RemoveAll((move) =>
-        {
-            if (move.pieceTarget.type == Piece.Type.None && move.flags != Move.Flags.EnPassant)
-                return true;
-
-            return false;
-        });
+        List<Move> moves = MoveGeneration.GetAllLegalMovesByColor(board, board.GetTurnColor(), true);
 
         // sort
 
@@ -247,8 +245,8 @@ public class Search
             }
             else
             {
-                int indexSource = color == Piece.Color.White ? 63 - moves[i].squareSourceIndex : moves[i].squareSourceIndex;
-                int indexTarget = color == Piece.Color.White ? 63 - moves[i].squareTargetIndex : moves[i].squareTargetIndex;
+                int indexSource = color == Piece.Color.White ? moves[i].squareSourceIndex : 63 - moves[i].squareSourceIndex;
+                int indexTarget = color == Piece.Color.White ? moves[i].squareTargetIndex : 63 - moves[i].squareTargetIndex;
 
                 switch (pieceTypeSource)
                 {

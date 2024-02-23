@@ -184,10 +184,11 @@ public static class MoveGeneration
     }
 
     // get controlled squares by color
+    // TODO: instead of using a bool array which is very wastefull, use a ulong and bitwise operations
 
-    public static bool[] GetControlledSquaresByColor(Board board, Piece.Color color)
+    public static ulong GetControlledSquaresBitboardByColor(Board board, Piece.Color color)
     {
-        bool[] squares = new bool[64];
+        ulong squares = 0;
 
         List<int> piecesIndices = board.GetPiecesIndices(color);
 
@@ -206,7 +207,8 @@ public static class MoveGeneration
 
                         if (targetPiece.color != piece.color) // none pieces have also none color
                         {
-                            squares[targetIndex] = true;
+                            squares |= ((ulong)1 << targetIndex);
+                            // squares[targetIndex] = true;
                         }
                     }
                     break;
@@ -219,7 +221,8 @@ public static class MoveGeneration
 
                         if (targetPiece.type == Piece.Type.None || targetPiece.color != piece.color)
                         {
-                            squares[targetIndex] = true;
+                            squares |= ((ulong)1 << targetIndex);
+                            // squares[targetIndex] = true;
                         }
                     }
                     break;
@@ -243,13 +246,15 @@ public static class MoveGeneration
 
                             if (targetPiece.type == Piece.Type.None)
                             {
-                                squares[targetIndex] = true;
+                                squares |= ((ulong)1 << targetIndex);
+                                // squares[targetIndex] = true;
                             }
                             else
                             {
                                 if (targetPiece.color != piece.color)
                                 {
-                                    squares[targetIndex] = true;
+                                    squares |= ((ulong)1 << targetIndex);
+                                    // squares[targetIndex] = true;
                                 }
 
                                 break;
@@ -266,7 +271,8 @@ public static class MoveGeneration
 
                         if (targetPiece.type == Piece.Type.None || targetPiece.color != piece.color)
                         {
-                            squares[targetIndex] = true;
+                            squares |= ((ulong)1 << targetIndex);
+                            // squares[targetIndex] = true;
                         }
                     }
                     break;
@@ -652,11 +658,11 @@ public static class MoveGeneration
 
         if (canCastleShort || canCastleLong)
         {
-            bool[] controlledSquaresByOpponent = GetControlledSquaresByColor(board, Piece.GetOppositeColor(piece.color));
+            ulong controlledSquaresByOpponent = GetControlledSquaresBitboardByColor(board, Piece.GetOppositeColor(piece.color));
 
             // first check if the king is in check
 
-            bool isKingInCheck = controlledSquaresByOpponent[index];
+            bool isKingInCheck = (controlledSquaresByOpponent & (1UL << index)) != 0;
 
             // if the king is not in check then
 
@@ -672,7 +678,7 @@ public static class MoveGeneration
                     {
                         Piece targetPiece = board.GetPiece(squareIndex);
 
-                        if (controlledSquaresByOpponent[squareIndex] || targetPiece.type != Piece.Type.None)
+                        if (((controlledSquaresByOpponent & (1UL << squareIndex)) != 0) || targetPiece.type != Piece.Type.None)
                         {
                             isShortCastleLegal = false;
                             break;
@@ -702,7 +708,7 @@ public static class MoveGeneration
                     {
                         Piece targetPiece = board.GetPiece(squareIndex);
 
-                        if (controlledSquaresByOpponent[squareIndex] || targetPiece.type != Piece.Type.None)
+                        if (((controlledSquaresByOpponent & (1UL << squareIndex)) != 0) || targetPiece.type != Piece.Type.None)
                         {
                             isLongCastleLegal = false;
                             break;
@@ -748,16 +754,11 @@ public static class MoveGeneration
 
         // get all the controlled squares by the opponent pieces
 
-        bool[] controlledSquares = GetControlledSquaresByColor(board, Piece.GetOppositeColor(color));
+        ulong controlledSquares = GetControlledSquaresBitboardByColor(board, Piece.GetOppositeColor(color));
 
         // check if the king square is attacked
 
-        if (controlledSquares[kingSquareIndex])
-        {
-            return true;
-        }
-
-        return false;
+        return (controlledSquares & (1UL << kingSquareIndex)) != 0;
     }
 
     // generate pseudo legal moves

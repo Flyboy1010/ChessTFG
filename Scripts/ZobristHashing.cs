@@ -132,7 +132,7 @@ public static class ZobristHashing
 
         ref readonly BoardState boardState = ref board.GetBoardState();
 
-        // TODO: castleling
+        // castleling
 
         if (boardState.CanCastleShort(Piece.Color.White))
         {

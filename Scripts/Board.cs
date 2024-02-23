@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Security;
 
 public class Board
 {
@@ -73,6 +74,10 @@ public class Board
                     piecesIndicesBlack.Remove(index);
                     break;
             }
+
+            // modify zobrist hash
+
+            zobrist ^= ZobristHashing.GetPieceKey(index, piecePrevious);
         }
 
         // handle new piece
@@ -88,6 +93,10 @@ public class Board
                     piecesIndicesBlack.Add(index);
                     break;
             }
+
+            // modify zobrist hash
+
+            zobrist ^= ZobristHashing.GetPieceKey(index, piece);
         }
 
         // set the piece
@@ -309,6 +318,10 @@ public class Board
 
     public void MakeMove(Move move, bool isTesting = false)
     {
+        // save previous board state
+
+        BoardState previousBoardState = currentBoardState;
+
         // save current board state
 
         boardStates.Push(currentBoardState);
@@ -449,9 +462,30 @@ public class Board
         Piece.Color turnColor = currentBoardState.GetTurnColor();
         currentBoardState.SetTurnColor(Piece.GetOppositeColor(turnColor));
 
-        // zobrist hashing
+        // update zobrist special flags
 
-        zobrist = ZobristHashing.GetKey(this);
+        if (previousBoardState.IsEnPassantAvailable() != currentBoardState.IsEnPassantAvailable())
+        {
+            zobrist ^= ZobristHashing.GetEnPassantKey();
+        }
+
+        for (int i = 0; i < 2; i++)
+        {
+            if (previousBoardState.CanCastleShort((Piece.Color)(i + 1)) != currentBoardState.CanCastleShort((Piece.Color)(i + 1)))
+            {
+                zobrist ^= ZobristHashing.GetShortCastleKey((Piece.Color)(i + 1));
+            }
+
+            if (previousBoardState.CanCastleLong((Piece.Color)(i + 1)) != currentBoardState.CanCastleLong((Piece.Color)(i + 1)))
+            {
+                zobrist ^= ZobristHashing.GetLongCastleKey((Piece.Color)(i + 1));
+            }
+        }
+
+        zobrist ^= ZobristHashing.GetTurnColorKey(previousBoardState.GetTurnColor());
+        zobrist ^= ZobristHashing.GetTurnColorKey(currentBoardState.GetTurnColor());
+
+        // add the current zobrist to the history
 
         if (!isTesting)
         {
@@ -472,9 +506,26 @@ public class Board
     {
         if (boardStates.Count > 0)
         {
+            // remove the current zobrist
+
+            if (!isTesting)
+            {
+                if (zobristHistory.TryGetValue(zobrist, out int count))
+                {
+                    if (count - 1 <= 0)
+                    {
+                        zobristHistory.Remove(zobrist);
+                    }
+                    else
+                    {
+                        zobristHistory[zobrist] = count - 1;
+                    }
+                }
+            }
+
             // get back to the last state
 
-            currentBoardState = boardStates.Pop();
+            BoardState previousBoardState = boardStates.Pop();
 
             // get the last move and undo it
 
@@ -530,32 +581,40 @@ public class Board
                     }
                     break;
                 case Move.Flags.EnPassant:
-                    SetPiece(currentBoardState.GetEnPassantSquareIndex(), new Piece()
+                    SetPiece(previousBoardState.GetEnPassantSquareIndex(), new Piece()
                     {
                         type = Piece.Type.Pawn,
-                        color = currentBoardState.GetEnPassantColor()
+                        color = previousBoardState.GetEnPassantColor()
                     });
                     break;
             }
 
-            // zobrist hashing
+            // update zobrist
 
-            if (!isTesting)
+            if (currentBoardState.IsEnPassantAvailable() != previousBoardState.IsEnPassantAvailable())
             {
-                if (zobristHistory.TryGetValue(zobrist, out int count))
+                zobrist ^= ZobristHashing.GetEnPassantKey();
+            }
+
+            for (int i = 0; i < 2; i++)
+            {
+                if (previousBoardState.CanCastleShort((Piece.Color)(i + 1)) != currentBoardState.CanCastleShort((Piece.Color)(i + 1)))
                 {
-                    if (count - 1 <= 0)
-                    {
-                        zobristHistory.Remove(zobrist);
-                    }
-                    else
-                    {
-                        zobristHistory[zobrist] = count - 1;
-                    }
+                    zobrist ^= ZobristHashing.GetShortCastleKey((Piece.Color)(i + 1));
+                }
+
+                if (previousBoardState.CanCastleLong((Piece.Color)(i + 1)) != currentBoardState.CanCastleLong((Piece.Color)(i + 1)))
+                {
+                    zobrist ^= ZobristHashing.GetLongCastleKey((Piece.Color)(i + 1));
                 }
             }
 
-            zobrist = ZobristHashing.GetKey(this);
+            zobrist ^= ZobristHashing.GetTurnColorKey(currentBoardState.GetTurnColor());
+            zobrist ^= ZobristHashing.GetTurnColorKey(previousBoardState.GetTurnColor());
+
+            // update current board state to previous
+
+            currentBoardState = previousBoardState;
         }
     }
 }

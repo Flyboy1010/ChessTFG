@@ -24,7 +24,7 @@ public class PlayerAI : Player
         // init
 
         this.board = board;
-        search = new Search(5);
+        search = new Search(6);
     }
 
     public override void NotifyTurnToMove()

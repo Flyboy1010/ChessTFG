@@ -21,14 +21,17 @@ public class Search
 
 	private Board board;
 
-    // depth to search
-
-    private int targetDepth;
-
 	// best move found
 
 	private Move bestMoveFound;
 	private int bestEvalFound = negativeInfinity;
+
+    private Move bestMoveIteration;
+    private int bestEvalIteration;
+
+    // search cancelled flag
+
+    private bool isSearchCanceled;
 
     // transposition table
 
@@ -36,12 +39,8 @@ public class Search
 
     // ctor
 
-    public Search(int depth)
+    public Search()
 	{
-        // init
-
-        targetDepth = depth;
-
         // transposition table
 
         int sizeInEntries = (ttSizeInMb * 1024 * 1024) / TranspositionTable.Entry.GetSize();
@@ -53,6 +52,13 @@ public class Search
     public void SetBoard(Board board)
     {
         this.board = board;
+    }
+
+    // cancell search
+
+    public void Cancel()
+    {
+        isSearchCanceled = true;
     }
 
 	// get best move
@@ -69,30 +75,49 @@ public class Search
         // prepare the search
 
 		bestMoveFound = Move.NullMove;
-
-        // do the search
+        bestEvalFound = int.MinValue;
+        isSearchCanceled = false;
 
         Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
 
-        int eval = SearchMoves(targetDepth, 0, negativeInfinity, positiveInfinity);
+        // iterative deepening
 
-        stopwatch.Stop();
+        for (int depth = 1; depth < 99; depth++)
+        {
+            bestMoveIteration = Move.NullMove;
+            bestEvalIteration = negativeInfinity;
 
-        GD.Print("Time: " + stopwatch.ElapsedMilliseconds);
+            stopwatch.Start();
+            SearchMoves(depth, 0, negativeInfinity, positiveInfinity);
+            stopwatch.Stop();
 
-        // check if mate score
+            if (!bestMoveIteration.IsEqual(Move.NullMove))
+            {
+                bestMoveFound = bestMoveIteration;
+                bestEvalFound = bestEvalIteration;
+            }
 
-        //if (Math.Abs(eval) >= mateScore - 1000)
-        //{
-        //    int numPlyToMate = Math.Abs(eval - mateScore);
-        //    int numMovesToMate = (int)Math.Ceiling(numPlyToMate / 2f);
-        //    GD.Print("Checkmate in " + numPlyToMate + " moves");
-        //}
-        //else
-        //{
-        //    GD.Print(eval / 100.0f);
-        //}
+            if (isSearchCanceled)
+            {
+                GD.Print("Search canceled at depth: " + depth);
+                GD.Print("Partial search result move: " + Utils.FromMoveToString(bestMoveFound) + " eval: " + (bestEvalFound / 100.0f).ToString("+00.00;-00.00", System.Globalization.CultureInfo.InvariantCulture) + " time: " + stopwatch.ElapsedMilliseconds + "ms");
+                break;
+            }
+            else
+            {
+                GD.Print("Depth: " + depth + " move: " + Utils.FromMoveToString(bestMoveIteration) + " eval: " + (bestEvalIteration / 100.0f).ToString("+00.00;-00.00", System.Globalization.CultureInfo.InvariantCulture) + " time: " + stopwatch.ElapsedMilliseconds + "ms");
+            }
+
+            //if (Math.Abs(bestEvalFound) >= mateScore - 1000)
+            //{
+            //    int numPlyToMate = Math.Abs(bestEvalFound - mateScore);
+            //    int numMovesToMate = (int)Math.Ceiling(numPlyToMate / 2f);
+            //    GD.Print("Checkmate in " + numMovesToMate + " moves");
+            //    break;
+            //}
+        }
+
+        GD.Print();
 
         // on search complete
 
@@ -120,7 +145,7 @@ public class Search
 
         // sort
 
-        SortMoves(moves, board.GetTurnColor());
+        SortMoves(moves, board.GetTurnColor(), Move.NullMove);
 
         // calculate eval
 
@@ -145,6 +170,13 @@ public class Search
 
     public int SearchMoves(int depth, int plyFromRoot, int alpha, int beta)
     {
+        // if search canceled
+
+        if (isSearchCanceled)
+        {
+            return 0;
+        }
+
         // check the transposition table
 
         ulong zobrist = board.GetZobrist();
@@ -154,8 +186,8 @@ public class Search
             if (plyFromRoot == 0)
             {
                 TranspositionTable.Entry tEntry = tt.GetEntry(zobrist);
-                bestMoveFound = tEntry.move;
-                bestEvalFound = tEntry.value;
+                bestMoveIteration = tEntry.move;
+                bestEvalIteration = tEntry.value;
             }
 
             return ttVal;
@@ -187,7 +219,21 @@ public class Search
             return 0;
         }
 
-        SortMoves(moves, board.GetTurnColor());
+        // sort moves
+
+        Move hashMove;
+
+        if (plyFromRoot == 0)
+        {
+            hashMove = bestMoveFound;
+        }
+        else
+        {
+            TranspositionTable.Entry entry = tt.GetEntry(board.GetZobrist());
+            hashMove = entry.move;
+        }
+
+        SortMoves(moves, board.GetTurnColor(), hashMove);
 
         // calculate eval
 
@@ -196,9 +242,16 @@ public class Search
 
         foreach (Move move in moves)
         {
-            board.MakeMove(move, true);
+            board.MakeMove(move);
             int evaluation = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
-            board.UndoMove(true);
+            board.UndoMove();
+
+            // if search canceled
+
+            if (isSearchCanceled)
+            {
+                return 0;
+            }
 
             if (evaluation >= beta) // Beta cutoff
             {
@@ -215,8 +268,8 @@ public class Search
 
                 if (plyFromRoot == 0)
                 {
-                    bestMoveFound = move;
-                    bestEvalFound = evaluation;
+                    bestMoveIteration = move;
+                    bestEvalIteration = evaluation;
                 }
             }
         }
@@ -228,12 +281,18 @@ public class Search
 
     // sort moves
 
-    private void SortMoves(List<Move> moves, Piece.Color color)
+    private void SortMoves(List<Move> moves, Piece.Color color, Move hashMove)
     {
         int[] moveScore = new int[moves.Count];
 
         for (int i = 0; i < moves.Count; i++)
         {
+            if (moves[i].IsEqual(hashMove))
+            {
+                moveScore[i] += 10000000;
+                continue;
+            }
+
             moveScore[i] = 0;
 
             Piece.Type pieceTypeTarget = moves[i].pieceTarget.type;

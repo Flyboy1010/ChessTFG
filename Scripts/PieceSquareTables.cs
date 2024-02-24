@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Diagnostics.Contracts;
 
 public static class PieceSquareTables
 {
@@ -76,4 +77,17 @@ public static class PieceSquareTables
          20, 20,  0,  0,  0,  0, 20, 20,
          20, 30, 10,  0,  0, 10, 30, 20
     };
+
+    // read value from a table 
+
+    public static int Read(int[] table, int index, Piece.Color color)
+    {
+        switch (color)
+        {
+            case Piece.Color.White: return table[index];
+            case Piece.Color.Black: return table[63 - index];
+        }
+
+        return 0;
+    }
 }

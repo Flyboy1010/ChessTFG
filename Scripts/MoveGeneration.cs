@@ -184,7 +184,6 @@ public static class MoveGeneration
     }
 
     // get controlled squares by color
-    // TODO: instead of using a bool array which is very wastefull, use a ulong and bitwise operations
 
     public static ulong GetControlledSquaresBitboardByColor(Board board, Piece.Color color)
     {
@@ -207,8 +206,7 @@ public static class MoveGeneration
 
                         if (targetPiece.color != piece.color) // none pieces have also none color
                         {
-                            squares |= ((ulong)1 << targetIndex);
-                            // squares[targetIndex] = true;
+                            squares |= (1UL << targetIndex);
                         }
                     }
                     break;
@@ -221,8 +219,7 @@ public static class MoveGeneration
 
                         if (targetPiece.type == Piece.Type.None || targetPiece.color != piece.color)
                         {
-                            squares |= ((ulong)1 << targetIndex);
-                            // squares[targetIndex] = true;
+                            squares |= (1UL << targetIndex);
                         }
                     }
                     break;
@@ -246,15 +243,13 @@ public static class MoveGeneration
 
                             if (targetPiece.type == Piece.Type.None)
                             {
-                                squares |= ((ulong)1 << targetIndex);
-                                // squares[targetIndex] = true;
+                                squares |= (1UL << targetIndex);
                             }
                             else
                             {
                                 if (targetPiece.color != piece.color)
                                 {
-                                    squares |= ((ulong)1 << targetIndex);
-                                    // squares[targetIndex] = true;
+                                    squares |= (1UL << targetIndex);
                                 }
 
                                 break;
@@ -271,8 +266,7 @@ public static class MoveGeneration
 
                         if (targetPiece.type == Piece.Type.None || targetPiece.color != piece.color)
                         {
-                            squares |= ((ulong)1 << targetIndex);
-                            // squares[targetIndex] = true;
+                            squares |= (1UL << targetIndex);
                         }
                     }
                     break;

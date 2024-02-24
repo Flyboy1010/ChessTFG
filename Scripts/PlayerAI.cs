@@ -4,6 +4,10 @@ using System.Threading.Tasks;
 
 public class PlayerAI : Player
 {
+    // constants
+
+    private const int searchTime = 3000; // ms
+
     // board
 
     private Board board;
@@ -24,7 +28,7 @@ public class PlayerAI : Player
         // init
 
         this.board = board;
-        search = new Search(6);
+        search = new Search();
     }
 
     public override void NotifyTurnToMove()
@@ -38,19 +42,15 @@ public class PlayerAI : Player
 
         Task.Run(() =>
         {
-            CalculateBestMove();
+            search.StartSearch();
         });
-    }
 
-    private void CalculateBestMove()
-    {
-        // Your code to calculate the best move goes here
-        // This method will execute asynchronously in a separate thread
-        // Make sure to handle synchronization if needed
+        // 
 
-        // Thread.Sleep(2000);
-        
-        search.StartSearch();
+        Task.Delay(searchTime).ContinueWith((t) => 
+        {
+            search.Cancel();
+        });
     }
 
     private void OnSearchCompleted(Move move)

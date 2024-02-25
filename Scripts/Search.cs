@@ -82,7 +82,7 @@ public class Search
 
         // iterative deepening
 
-        for (int depth = 1; depth < 99; depth++)
+        for (int depth = 1; depth < 100; depth++)
         {
             bestMoveIteration = Move.NullMove;
             bestEvalIteration = negativeInfinity;
@@ -100,12 +100,22 @@ public class Search
             if (isSearchCanceled)
             {
                 GD.Print("Search canceled at depth: " + depth);
-                GD.Print("Partial search result move: " + Utils.FromMoveToString(bestMoveFound) + " eval: " + (bestEvalFound / 100.0f).ToString("+00.00;-00.00", System.Globalization.CultureInfo.InvariantCulture) + " time: " + stopwatch.ElapsedMilliseconds + "ms");
+                GD.Print("Partial search result move: " + Utils.FromMoveToString(bestMoveFound) + " eval: " + bestEvalFound + " time: " + stopwatch.ElapsedMilliseconds + "ms");
                 break;
             }
             else
             {
-                GD.Print("Depth: " + depth + " move: " + Utils.FromMoveToString(bestMoveIteration) + " eval: " + (bestEvalIteration / 100.0f).ToString("+00.00;-00.00", System.Globalization.CultureInfo.InvariantCulture) + " time: " + stopwatch.ElapsedMilliseconds + "ms");
+                if (bestEvalFound >= mateScore - 1000)
+                {
+                    int numPlyToMate = Math.Abs(bestEvalFound - mateScore);
+                    int numMovesToMate = (int)Math.Ceiling(numPlyToMate / 2f);
+                    GD.Print("Depth: " + depth + " move: " + Utils.FromMoveToString(bestMoveIteration) + " eval: Mate in " + numMovesToMate + " time: " + stopwatch.ElapsedMilliseconds + "ms");
+                    break;
+                }
+                else
+                {
+                    GD.Print("Depth: " + depth + " move: " + Utils.FromMoveToString(bestMoveIteration) + " eval: " + bestEvalIteration + " time: " + stopwatch.ElapsedMilliseconds + "ms");
+                }
             }
 
             //if (Math.Abs(bestEvalFound) >= mateScore - 1000)
@@ -242,9 +252,9 @@ public class Search
 
         foreach (Move move in moves)
         {
-            board.MakeMove(move);
+            board.MakeMove(move, true);
             int evaluation = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
-            board.UndoMove();
+            board.UndoMove(true);
 
             // if search canceled
 

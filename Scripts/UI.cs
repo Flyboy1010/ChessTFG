@@ -150,4 +150,11 @@ public partial class UI : Control
 
 		GetTree().Quit();
 	}
+
+	// update
+
+	public override void _Process(double delta)
+	{
+
+    }
 }

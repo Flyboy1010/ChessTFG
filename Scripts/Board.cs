@@ -167,6 +167,7 @@ public class Board
         board.piecesIndicesBlack.AddRange(piecesIndicesBlack.ToArray());
         board.currentBoardState = currentBoardState;
         board.zobrist = zobrist;
+        board.zobristHistory = new Dictionary<ulong, int>(zobristHistory);
 
         return board;
     }

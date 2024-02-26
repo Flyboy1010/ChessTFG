@@ -250,10 +250,28 @@ public class Search
         TranspositionTable.NodeType nodeType = TranspositionTable.NodeType.UpperBound;
         Move bestMoveInThisPosition = Move.NullMove;
 
-        foreach (Move move in moves)
+        for (int i = 0; i < moves.Count; i++)
         {
-            board.MakeMove(move, true);
-            int evaluation = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
+            board.MakeMove(moves[i], true);
+
+            // late move reduction
+
+            int evaluation = 0;
+            bool needsFullSearch = true;
+            bool isCapture = moves[i].pieceTarget.type != Piece.Type.None;
+
+            if (i >= 3 && depth > 3 && !isCapture)
+            {
+                const int reduction = 1;
+                evaluation = -SearchMoves(depth - 1 - reduction, plyFromRoot + 1, -beta, -alpha);
+                needsFullSearch = evaluation > alpha;
+            }
+
+            if (needsFullSearch)
+            {
+                evaluation = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
+            }
+
             board.UndoMove(true);
 
             // if search canceled
@@ -265,20 +283,20 @@ public class Search
 
             if (evaluation >= beta) // Beta cutoff
             {
-                tt.Store(zobrist, depth, beta, TranspositionTable.NodeType.LowerBound, move);
+                tt.Store(zobrist, depth, beta, TranspositionTable.NodeType.LowerBound, moves[i]);
                 return beta;
             }
 
             if (evaluation > alpha)
             {
                 nodeType = TranspositionTable.NodeType.Exact;
-                bestMoveInThisPosition = move;
+                bestMoveInThisPosition = moves[i];
 
                 alpha = evaluation;
 
                 if (plyFromRoot == 0)
                 {
-                    bestMoveIteration = move;
+                    bestMoveIteration = moves[i];
                     bestEvalIteration = evaluation;
                 }
             }

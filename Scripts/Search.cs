@@ -105,12 +105,16 @@ public class Search
             }
             else
             {
-                if (bestEvalFound >= mateScore - 1000)
+                if (bestEvalIteration >= mateScore - 1000)
                 {
-                    int numPlyToMate = Math.Abs(bestEvalFound - mateScore);
-                    int numMovesToMate = (int)Math.Ceiling(numPlyToMate / 2f);
-                    GD.Print("Depth: " + depth + " move: " + Utils.FromMoveToString(bestMoveIteration) + " eval: Mate in " + numMovesToMate + " time: " + stopwatch.ElapsedMilliseconds + "ms");
-                    break;
+                    int numMovesToMate = Math.Abs(bestEvalIteration - mateScore);
+                    int numPlyToMate = (int)Math.Ceiling(numMovesToMate / 2f);
+                    GD.Print("Depth: " + depth + " move: " + Utils.FromMoveToString(bestMoveIteration) + " eval: Mate in " + numPlyToMate + " time: " + stopwatch.ElapsedMilliseconds + "ms");
+
+                    if (numMovesToMate <= depth)
+                    {
+                        break;
+                    }
                 }
                 else
                 {
@@ -259,8 +263,9 @@ public class Search
             int evaluation = 0;
             bool needsFullSearch = true;
             bool isCapture = moves[i].pieceTarget.type != Piece.Type.None;
+            bool isInCheck = MoveGeneration.IsKingInCheck(board, board.GetTurnColor());
 
-            if (i >= 3 && depth > 3 && !isCapture)
+            if (i >= 3 && depth > 3 && !isCapture && !isInCheck)
             {
                 const int reduction = 1;
                 evaluation = -SearchMoves(depth - 1 - reduction, plyFromRoot + 1, -beta, -alpha);

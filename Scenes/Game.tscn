@@ -11,8 +11,8 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_b1cto"]
 shader = ExtResource("6_8nyfd")
-shader_parameter/u_colorWhite = Color(0.921569, 0.85098, 0.768627, 1)
-shader_parameter/u_colorBlack = Color(0.490196, 0.384314, 0.317647, 1)
+shader_parameter/u_colorWhite = Color(0.878, 0.796, 0.71, 1)
+shader_parameter/u_colorBlack = Color(0.584, 0.42, 0.353, 1)
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_ebuse")
@@ -41,7 +41,7 @@ offset_left = -15.0
 offset_top = -15.0
 offset_right = 855.0
 offset_bottom = 855.0
-color = Color(0.22, 0.22, 0.22, 1)
+color = Color(0.180392, 0.176471, 0.180392, 1)
 
 [node name="UI" type="Control" parent="." node_paths=PackedStringArray("gameOverLabel", "gameOverReasonLabel", "zobristHashNumberLabel", "zobristHashNumberBitsLabel", "lastMoveLabel", "evaluationLabel")]
 layout_mode = 3

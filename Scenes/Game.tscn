@@ -22,9 +22,9 @@ position = Vector2(540, 120)
 script = ExtResource("2_yqws2")
 squareSize = 105
 piecesTexture = ExtResource("3_h5sm6")
-hintLastMoveColor = Color(0.858824, 0.780392, 0.34902, 0.501961)
 hintCircleMaterial = ExtResource("4_yg707")
 hintCircleWithHoleMaterial = ExtResource("5_1ckw8")
+animationTime = 0.25
 metadata/_edit_group_ = true
 
 [node name="BoardSquares" type="ColorRect" parent="BoardGraphics"]

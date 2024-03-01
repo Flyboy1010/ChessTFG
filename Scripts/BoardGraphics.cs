@@ -15,7 +15,7 @@ public partial class BoardGraphics : Node2D
 
 	// exported variables
 
-	[Export] private int squareSize;
+	[Export] private int squareSize = 105;
 	[Export] private Texture2D piecesTexture;
     [Export] private Color hintLastMoveColor = new Color(0.858f, 0.78f, 0.35f, 0.502f);
     [Export] private Material hintCircleMaterial;
@@ -148,6 +148,7 @@ public partial class BoardGraphics : Node2D
                 hintSprite.Size = new Vector2(squareSize, squareSize);
                 hintSprite.Position = new Vector2(i, j) * squareSize;
                 hintSprite.Visible = false;
+                hintSprite.ProcessMode = ProcessModeEnum.Disabled;
 
                 hintsSprites[i + j * 8] = hintSprite;
                 AddChild(hintSprite);
@@ -167,6 +168,7 @@ public partial class BoardGraphics : Node2D
                 pieceSprite.TextureFilter = TextureFilterEnum.LinearWithMipmapsAnisotropic;
                 pieceSprite.Texture = piecesTexture;
                 pieceSprite.Scale = pieceScale;
+                pieceSprite.ProcessMode = ProcessModeEnum.Disabled;
 
                 piecesSprites[i + j * 8] = pieceSprite;
                 AddChild(pieceSprite);
@@ -476,25 +478,6 @@ public partial class BoardGraphics : Node2D
 
             DrawRect(new Rect2(i * squareSize + 3, j * squareSize + 3, squareSize - 6, squareSize - 6), new Color(1.0f, 1.0f, 1.0f, 0.65f), false, 6);
         }
-
-        //// draw pieces indices
-
-        //List<int> piecesIndicesWhite = board.GetPiecesIndices(Piece.Color.White);
-        //List<int> piecesIndicesBlack = board.GetPiecesIndices(Piece.Color.Black);
-
-        //foreach (int i in piecesIndicesWhite)
-        //{
-        //    int x = i % 8;
-        //    int y = i / 8;
-        //    DrawRect(new Rect2(x * squareSize, y * squareSize, squareSize, squareSize), Color.Color8(0, 255, 0, 80));
-        //}
-
-        //foreach (int i in piecesIndicesBlack)
-        //{
-        //    int x = i % 8;
-        //    int y = i / 8;
-        //    DrawRect(new Rect2(x * squareSize, y * squareSize, squareSize, squareSize), Color.Color8(255, 0, 0, 80));
-        //}
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

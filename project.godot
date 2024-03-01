@@ -13,7 +13,10 @@ config_version=5
 config/name="Chess"
 run/main_scene="res://Scenes/Game.tscn"
 config/features=PackedStringArray("4.2", "C#", "Mobile")
-config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0.145098, 0.141176, 0.145098, 1)
+boot_splash/image="res://Assets/Sprites/icon.png"
+boot_splash/fullsize=false
+config/icon="res://Assets/Sprites/icon.png"
 
 [display]
 
@@ -40,3 +43,4 @@ Select={
 
 renderer/rendering_method="mobile"
 environment/defaults/default_clear_color=Color(0.145098, 0.141176, 0.145098, 1)
+2d/snap/snap_2d_vertices_to_pixel=true

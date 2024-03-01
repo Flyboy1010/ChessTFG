@@ -3,7 +3,7 @@ using System;
 
 public abstract class Player
 {
-	// 
+	// on move chosen action
 
 	public event System.Action<Move, bool> onMoveChosen;
 
@@ -11,7 +11,7 @@ public abstract class Player
 
 	public abstract void Update();
 
-	// called when its the player  turn
+	// called when its the player's  turn
 
 	public abstract void NotifyTurnToMove();
 

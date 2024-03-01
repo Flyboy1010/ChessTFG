@@ -100,7 +100,7 @@ public class Search
             if (isSearchCanceled)
             {
                 GD.Print("Search canceled at depth: " + depth);
-                GD.Print("Partial search result move: " + Utils.FromMoveToString(bestMoveFound) + " eval: " + bestEvalFound + " time: " + stopwatch.ElapsedMilliseconds + "ms");
+                GD.Print("Partial search result best move: " + Utils.FromMoveToString(bestMoveFound) + ", eval: " + bestEvalFound + ", time: " + stopwatch.ElapsedMilliseconds + "ms");
                 break;
             }
             else
@@ -109,7 +109,7 @@ public class Search
                 {
                     int numMovesToMate = Math.Abs(bestEvalIteration - mateScore);
                     int numPlyToMate = (int)Math.Ceiling(numMovesToMate / 2f);
-                    GD.Print("Depth: " + depth + " move: " + Utils.FromMoveToString(bestMoveIteration) + " eval: Mate in " + numPlyToMate + " time: " + stopwatch.ElapsedMilliseconds + "ms");
+                    GD.Print("Depth: " + depth + ", best move: " + Utils.FromMoveToString(bestMoveIteration) + ", eval: Mate in " + numPlyToMate + " ply, time: " + stopwatch.ElapsedMilliseconds + "ms");
 
                     if (numMovesToMate <= depth)
                     {
@@ -118,7 +118,7 @@ public class Search
                 }
                 else
                 {
-                    GD.Print("Depth: " + depth + " move: " + Utils.FromMoveToString(bestMoveIteration) + " eval: " + bestEvalIteration + " time: " + stopwatch.ElapsedMilliseconds + "ms");
+                    GD.Print("Depth: " + depth + ", best move: " + Utils.FromMoveToString(bestMoveIteration) + ", eval: " + bestEvalIteration + ", time: " + stopwatch.ElapsedMilliseconds + "ms");
                 }
             }
 

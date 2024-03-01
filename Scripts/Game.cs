@@ -56,7 +56,8 @@ public partial class Game : Node2D
 
     // audio
 
-    private AudioStreamPlayer audioPlayer;
+    private AudioStreamPlayer audioPlayerWhite;
+    private AudioStreamPlayer audioPlayerBlack;
     private Dictionary<string, AudioStream> audioStreams = new Dictionary<string, AudioStream>();
 
     // Called when the node enters the scene tree for the first time.
@@ -67,11 +68,12 @@ public partial class Game : Node2D
 
         boardGraphics = GetNode<BoardGraphics>("BoardGraphics");
         ui = GetNode<UI>("UI");
-        audioPlayer = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
+        audioPlayerWhite = GetNode<AudioStreamPlayer>("AudioPlayerWhite");
+        audioPlayerBlack = GetNode<AudioStreamPlayer>("AudioPlayerBlack");
 
-		// init the board and load the fen
+        // init the board and load the fen
 
-		board = new Board();
+        board = new Board();
 		board.LoadFenString(Board.StartFEN);
 
 		// connect the board graphical representation with the board itself
@@ -110,6 +112,8 @@ public partial class Game : Node2D
 
     private void PlaySound(Move move)
     {
+        AudioStreamPlayer audioPlayer = move.pieceSource.color == Piece.Color.White ? audioPlayerWhite : audioPlayerBlack;
+
         switch (move.flags)
         {
             case Move.Flags.EnPassant:

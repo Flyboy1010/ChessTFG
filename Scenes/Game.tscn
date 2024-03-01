@@ -20,7 +20,6 @@ script = ExtResource("1_ebuse")
 [node name="BoardGraphics" type="Node2D" parent="."]
 position = Vector2(540, 120)
 script = ExtResource("2_yqws2")
-squareSize = 105
 piecesTexture = ExtResource("3_h5sm6")
 hintCircleMaterial = ExtResource("4_yg707")
 hintCircleWithHoleMaterial = ExtResource("5_1ckw8")
@@ -244,7 +243,9 @@ vertical_alignment = 1
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 540)
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[node name="AudioPlayerWhite" type="AudioStreamPlayer" parent="."]
+
+[node name="AudioPlayerBlack" type="AudioStreamPlayer" parent="."]
 
 [connection signal="OnGameOver" from="." to="UI" method="OnGameOver"]
 [connection signal="OnGameTurn" from="." to="UI" method="OnGameTurn"]

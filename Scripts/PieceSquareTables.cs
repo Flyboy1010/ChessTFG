@@ -90,4 +90,27 @@ public static class PieceSquareTables
 
         return 0;
     }
+
+    // get piece table
+
+    public static int[] GetTable(Piece.Type type)
+    {
+        switch (type)
+        {
+            case Piece.Type.Pawn:
+                return PawnTable;
+            case Piece.Type.Knight:
+                return KnightTable;
+            case Piece.Type.Bishop:
+                return BishopTable;
+            case Piece.Type.Rook:
+                return RookTable;
+            case Piece.Type.Queen:
+                return QueenTable;
+            case Piece.Type.King:
+                return KingTable;
+        }
+
+        return null;
+    }
 }

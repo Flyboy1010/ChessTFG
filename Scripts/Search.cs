@@ -105,7 +105,7 @@ public class Search
             }
             else
             {
-                if (bestEvalIteration >= mateScore - 1000)
+                if (Math.Abs(bestEvalIteration) >= mateScore - 1000)
                 {
                     int numMovesToMate = Math.Abs(bestEvalIteration - mateScore);
                     int numPlyToMate = (int)Math.Ceiling(numMovesToMate / 2f);
@@ -121,14 +121,6 @@ public class Search
                     GD.Print("Depth: " + depth + ", best move: " + Utils.FromMoveToString(bestMoveIteration) + ", eval: " + bestEvalIteration + ", time: " + stopwatch.ElapsedMilliseconds + "ms");
                 }
             }
-
-            //if (Math.Abs(bestEvalFound) >= mateScore - 1000)
-            //{
-            //    int numPlyToMate = Math.Abs(bestEvalFound - mateScore);
-            //    int numMovesToMate = (int)Math.Ceiling(numPlyToMate / 2f);
-            //    GD.Print("Checkmate in " + numMovesToMate + " moves");
-            //    break;
-            //}
         }
 
         GD.Print();
@@ -320,48 +312,38 @@ public class Search
 
         for (int i = 0; i < moves.Count; i++)
         {
+            moveScore[i] = 0;
+
+            // check if is the hash move
+
             if (moves[i].IsEqual(hashMove))
             {
+                // bonus for hash move
+
                 moveScore[i] += 10000000;
                 continue;
             }
 
-            moveScore[i] = 0;
+            // check if it is a capture
 
             Piece.Type pieceTypeTarget = moves[i].pieceTarget.type;
             Piece.Type pieceTypeSource = moves[i].pieceSource.type;
 
             if (pieceTypeTarget != Piece.Type.None)
             {
+                // bonus for capture
+
                 moveScore[i] += 10 * Evaluation.GetPieceValue(pieceTypeTarget) - Evaluation.GetPieceValue(pieceTypeSource);
             }
             else
             {
-                int indexSource = color == Piece.Color.White ? moves[i].squareSourceIndex : 63 - moves[i].squareSourceIndex;
-                int indexTarget = color == Piece.Color.White ? moves[i].squareTargetIndex : 63 - moves[i].squareTargetIndex;
+                // bonus for moving the piece into a better square
 
-                switch (pieceTypeSource)
-                {
-                    case Piece.Type.Pawn:
-                        moveScore[i] += PieceSquareTables.PawnTable[indexTarget] - PieceSquareTables.PawnTable[indexSource];
-                        break;
-                    case Piece.Type.Knight:
-                        moveScore[i] += PieceSquareTables.KnightTable[indexTarget] - PieceSquareTables.KnightTable[indexSource];
-                        break;
-                    case Piece.Type.Bishop:
-                        moveScore[i] += PieceSquareTables.BishopTable[indexTarget] - PieceSquareTables.BishopTable[indexSource];
-                        break;
-                    case Piece.Type.Rook:
-                        moveScore[i] += PieceSquareTables.RookTable[indexTarget] - PieceSquareTables.RookTable[indexSource];
-                        break;
-                    case Piece.Type.Queen:
-                        moveScore[i] += PieceSquareTables.QueenTable[indexTarget] - PieceSquareTables.QueenTable[indexSource];
-                        break;
-                    case Piece.Type.King:
-                        moveScore[i] += PieceSquareTables.KingTable[indexTarget] - PieceSquareTables.KingTable[indexSource];
-                        break;
-                }
+                int[] table = PieceSquareTables.GetTable(pieceTypeSource);
+                moveScore[i] += PieceSquareTables.Read(table, moves[i].squareTargetIndex, color) - PieceSquareTables.Read(table, moves[i].squareSourceIndex, color);
             }
+
+            // bonus for promotion
 
             if (moves[i].flags == Move.Flags.Promotion)
             {

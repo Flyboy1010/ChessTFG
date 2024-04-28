@@ -10,7 +10,6 @@ public partial class UI : Control
 	[Export] private Label zobristHashNumberLabel;
 	[Export] private RichTextLabel zobristHashNumberBitsLabel;
 	[Export] private Label lastMoveLabel;
-	[Export] private Label evaluationLabel;
 
 	// game connected to
 
@@ -84,11 +83,6 @@ public partial class UI : Control
 		string zobristKeyString = Utils.ConvertULongToBinaryString(zobristKey);
 		string zobristKeyStringColored = zobristKeyString.Replace("1", "[color=cd4e53]1[/color]");
 		zobristHashNumberBitsLabel.Text = "[center]" + zobristKeyStringColored + "[/center]";
-
-		// calculate evaluation
-
-		int evaluation = Evaluation.EvaluateBoard(board, Piece.Color.White);
-		evaluationLabel.Text = "Evaluation: " + (evaluation / 100.0f).ToString("+00.00;-00.00", System.Globalization.CultureInfo.InvariantCulture);
 	}
 
 	// on play as white
@@ -101,7 +95,6 @@ public partial class UI : Control
 
         gameOverLabel.Visible = false;
         gameOverReasonLabel.Visible = false;
-        evaluationLabel.Text = "Evaluation: +00.00";
     }
 
 	// on play as black
@@ -114,7 +107,6 @@ public partial class UI : Control
 
         gameOverLabel.Visible = false;
         gameOverReasonLabel.Visible = false;
-        evaluationLabel.Text = "Evaluation: +00.00";
     }
 
 	// on play vs human
@@ -127,7 +119,6 @@ public partial class UI : Control
 
         gameOverLabel.Visible = false;
         gameOverReasonLabel.Visible = false;
-        evaluationLabel.Text = "Evaluation: +00.00";
     }
 
     // on play ai

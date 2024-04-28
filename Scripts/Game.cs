@@ -127,43 +127,6 @@ public partial class Game : Node2D
         audioPlayer.Play();
     }
 
-    // on move chosen
-
-    private void OnMoveChosen(Move move, bool isAnimated)
-    {
-        // make the move & calculate zobrist
-
-        board.MakeMove(move);
-
-        // disable highlight square
-
-        boardGraphics.HightlightSquare(-1);
-
-        // disable square selection
-
-        boardGraphics.SelectSquare(-1);
-
-        // disable hint moves
-
-        boardGraphics.SetHintMoves(null);
-
-        // animate the move
-
-        boardGraphics.AnimateMove(move, isAnimated, Callable.From(() =>
-        {
-            boardGraphics.UpdateGraphics();
-            gameState = GameState.NextTurn;
-        }));
-
-        // play sound
-
-        PlaySound(move);
-
-        // change state
-
-        gameState = GameState.WaitUntilCompleted;
-    }
-
     // play as color
 
     public void PlayAsColor(Piece.Color color, bool areBothHumans = false)
@@ -208,6 +171,43 @@ public partial class Game : Node2D
         boardGraphics.SelectSquare(-1);
         boardGraphics.SetHintMoves(null);
         boardGraphics.UpdateGraphics();
+    }
+
+    // on move chosen
+
+    private void OnMoveChosen(Move move, bool isAnimated)
+    {
+        // make the move & calculate zobrist
+
+        board.MakeMove(move);
+
+        // disable highlight square
+
+        boardGraphics.HightlightSquare(-1);
+
+        // disable square selection
+
+        boardGraphics.SelectSquare(-1);
+
+        // disable hint moves
+
+        boardGraphics.SetHintMoves(null);
+
+        // animate the move
+
+        boardGraphics.AnimateMove(move, isAnimated, Callable.From(() =>
+        {
+            boardGraphics.UpdateGraphics();
+            gameState = GameState.NextTurn;
+        }));
+
+        // play sound
+
+        PlaySound(move);
+
+        // change state
+
+        gameState = GameState.WaitUntilCompleted;
     }
 
     // update game state

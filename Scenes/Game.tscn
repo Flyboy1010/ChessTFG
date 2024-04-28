@@ -42,7 +42,7 @@ offset_right = 855.0
 offset_bottom = 855.0
 color = Color(0.180392, 0.176471, 0.180392, 1)
 
-[node name="UI" type="Control" parent="." node_paths=PackedStringArray("gameOverLabel", "gameOverReasonLabel", "zobristHashNumberLabel", "zobristHashNumberBitsLabel", "lastMoveLabel", "evaluationLabel")]
+[node name="UI" type="Control" parent="." node_paths=PackedStringArray("gameOverLabel", "gameOverReasonLabel", "zobristHashNumberLabel", "zobristHashNumberBitsLabel", "lastMoveLabel")]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("7_lpnj1")
@@ -51,7 +51,6 @@ gameOverReasonLabel = NodePath("GameOverInfo/VBoxContainer/GamerOverRreasonLabel
 zobristHashNumberLabel = NodePath("ZobristInfo/VBoxContainer/ZobristLabel")
 zobristHashNumberBitsLabel = NodePath("ZobristInfo/VBoxContainer/ZobristBitsLabel")
 lastMoveLabel = NodePath("DebugInfo/VBoxContainer/LastMoveLabel")
-evaluationLabel = NodePath("DebugInfo/VBoxContainer/EvaluationLabel")
 metadata/_edit_group_ = true
 
 [node name="ButtonsPanel" type="Control" parent="UI"]
@@ -141,20 +140,7 @@ offset_top = -52.0
 offset_bottom = 52.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="SearchDepthLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
-layout_mode = 2
-theme = ExtResource("8_65nis")
-theme_override_colors/font_color = Color(0.803922, 0.305882, 0.32549, 1)
-text = "Search depth: 6"
-vertical_alignment = 1
-
-[node name="EvaluationLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
-layout_mode = 2
-theme = ExtResource("8_65nis")
-theme_override_colors/font_color = Color(0.960784, 0.639216, 0.356863, 1)
-text = "Evaluation: +00.00"
-vertical_alignment = 1
+alignment = 1
 
 [node name="LastMoveLabel" type="Label" parent="UI/DebugInfo/VBoxContainer"]
 layout_mode = 2

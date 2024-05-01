@@ -183,9 +183,12 @@ public class Search
             return 0;
         }
 
-        // check the transposition table
+        // get zobrist from board
 
         ulong zobrist = board.GetZobrist();
+
+        // check the transposition table
+
         int ttVal = tt.Lookup(zobrist, depth, alpha, beta);
         if (ttVal != TranspositionTable.lookupFailed)
         {
@@ -199,11 +202,10 @@ public class Search
             return ttVal;
         }
 
-        //
+        // when reached 0 depth perform a quiescence search until a stable state (to get good results from evaluation)
 
         if (depth == 0)
         {
-            //return Evaluation.EvaluateBoard(board, board.GetTurnColor());
             int result = QuiescenceSearch(alpha, beta);
             return result;
         }
@@ -235,7 +237,7 @@ public class Search
         }
         else
         {
-            TranspositionTable.Entry entry = tt.GetEntry(board.GetZobrist());
+            TranspositionTable.Entry entry = tt.GetEntry(zobrist);
             hashMove = entry.move;
         }
 

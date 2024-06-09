@@ -56,7 +56,7 @@ public class Board
 
     // set piece
 
-    public void SetPiece(int index, Piece piece)
+    private void SetPiece(int index, Piece piece)
     {
         // handle previous piece
 

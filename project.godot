@@ -13,19 +13,20 @@ config_version=5
 config/name="Chess"
 run/main_scene="res://Scenes/Game.tscn"
 config/features=PackedStringArray("4.2", "C#", "Mobile")
-boot_splash/bg_color=Color(0.145098, 0.141176, 0.145098, 1)
-boot_splash/image="res://Assets/Sprites/icon.png"
+boot_splash/bg_color=Color(0.145098, 0.145098, 0.145098, 1)
+boot_splash/image="res://Assets/Sprites/icon_android.png"
 boot_splash/fullsize=false
 config/icon="res://Assets/Sprites/icon.png"
 
 [display]
 
-window/size/viewport_width=1920
-window/size/viewport_height=1080
-window/size/window_width_override=1280
-window/size/window_height_override=720
+window/size/viewport_width=1080
+window/size/viewport_height=2412
+window/size/window_width_override=360
+window/size/window_height_override=804
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/handheld/orientation=1
 
 [dotnet]
 
@@ -42,5 +43,6 @@ Select={
 [rendering]
 
 renderer/rendering_method="mobile"
-environment/defaults/default_clear_color=Color(0.145098, 0.141176, 0.145098, 1)
+textures/vram_compression/import_etc2_astc=true
+environment/defaults/default_clear_color=Color(0.145098, 0.145098, 0.145098, 1)
 2d/snap/snap_2d_vertices_to_pixel=true

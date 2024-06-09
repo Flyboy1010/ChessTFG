@@ -18,7 +18,7 @@ shader_parameter/u_colorBlack = Color(0.584, 0.42, 0.353, 1)
 script = ExtResource("1_ebuse")
 
 [node name="BoardGraphics" type="Node2D" parent="."]
-position = Vector2(540, 120)
+position = Vector2(120, 786)
 script = ExtResource("2_yqws2")
 piecesTexture = ExtResource("3_h5sm6")
 hintCircleMaterial = ExtResource("4_yg707")
@@ -36,10 +36,10 @@ metadata/_edit_group_ = true
 [node name="BoardBackground" type="ColorRect" parent="BoardGraphics/BoardSquares"]
 show_behind_parent = true
 layout_mode = 0
-offset_left = -15.0
-offset_top = -15.0
-offset_right = 855.0
-offset_bottom = 855.0
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 860.0
+offset_bottom = 860.0
 color = Color(0.180392, 0.176471, 0.180392, 1)
 
 [node name="UI" type="Control" parent="." node_paths=PackedStringArray("gameOverLabel", "gameOverReasonLabel", "zobristHashNumberLabel", "zobristHashNumberBitsLabel", "lastMoveLabel")]
@@ -58,10 +58,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 120.0
-offset_top = 225.0
-offset_right = 435.0
-offset_bottom = 855.0
+offset_left = 20.0
+offset_top = 1646.0
+offset_right = 1060.0
+offset_bottom = 2392.0
 grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_group_ = true
@@ -111,12 +111,14 @@ theme = ExtResource("8_65nis")
 text = "AI vs AI"
 
 [node name="QuitButton" type="Button" parent="UI/ButtonsPanel/VBoxContainer"]
+visible = false
 layout_mode = 2
 focus_mode = 0
 theme = ExtResource("8_65nis")
 text = "Quit"
 
 [node name="DebugInfo" type="Control" parent="UI"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -150,6 +152,7 @@ text = "Last move: -"
 vertical_alignment = 1
 
 [node name="ZobristInfo" type="Control" parent="UI"]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_left = 330.0
@@ -193,10 +196,10 @@ vertical_alignment = 1
 [node name="GameOverInfo" type="Control" parent="UI"]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 330.0
-offset_top = 8.0
-offset_right = 1590.0
-offset_bottom = 98.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 1060.0
+offset_bottom = 766.0
 metadata/_edit_group_ = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/GameOverInfo"]
@@ -221,13 +224,13 @@ vertical_alignment = 1
 layout_mode = 2
 theme = ExtResource("8_65nis")
 theme_override_colors/font_color = Color(0.411765, 0.411765, 0.411765, 1)
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 50
 text = "Black wins by checkmate"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(960, 540)
+position = Vector2(540, 1206)
 
 [node name="AudioPlayerWhite" type="AudioStreamPlayer" parent="."]
 

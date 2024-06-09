@@ -3,3 +3,5 @@
 # visual studio
 .vs/
 Properties/
+# keystore
+chess.keystore

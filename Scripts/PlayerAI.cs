@@ -29,6 +29,7 @@ public class PlayerAI : Player
 
         this.board = board;
         search = new Search();
+        search.onComplete += OnSearchCompleted;
     }
 
     public override void NotifyTurnToMove()
@@ -36,7 +37,6 @@ public class PlayerAI : Player
         moveFound = false;
         Board boardCopy = board.Copy();
         search.SetBoard(boardCopy);
-        search.onComplete += OnSearchCompleted;
 
         // Start a new Task to calculate the best move asynchronously
 

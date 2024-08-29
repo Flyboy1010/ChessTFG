@@ -40,21 +40,21 @@ public partial class UI : Control
 		{
 			case Game.GameOverReason.WhiteMated:
 				gameOverReasonLabel.Text = "Black wins by checkmate";
-                break;
-            case Game.GameOverReason.BlackMated:
-                gameOverReasonLabel.Text = "White wins by checkmate";
-                break;
-            case Game.GameOverReason.Drowned:
-                gameOverReasonLabel.Text = "Draw by drowned";
-                break;
-            case Game.GameOverReason.Repetition:
-                gameOverReasonLabel.Text = "Draw by repetition";
-                break;
-        }
+				break;
+			case Game.GameOverReason.BlackMated:
+				gameOverReasonLabel.Text = "White wins by checkmate";
+				break;
+			case Game.GameOverReason.Drowned:
+				gameOverReasonLabel.Text = "Draw by drowned";
+				break;
+			case Game.GameOverReason.Repetition:
+				gameOverReasonLabel.Text = "Draw by repetition";
+				break;
+		}
 
-        gameOverLabel.Visible = true;
-        gameOverReasonLabel.Visible = true;
-    }
+		gameOverLabel.Visible = true;
+		gameOverReasonLabel.Visible = true;
+	}
 
 	// on turn
 
@@ -73,8 +73,8 @@ public partial class UI : Control
 		}
 		else
 		{
-            lastMoveLabel.Text = "Last move: -";
-        }
+			lastMoveLabel.Text = "Last move: -";
+		}
 
 		// zobrist 
 
@@ -91,47 +91,47 @@ public partial class UI : Control
 	{
 		game.PlayAsColor(Piece.Color.White);
 
-        // hide labels
+		// hide labels
 
-        gameOverLabel.Visible = false;
-        gameOverReasonLabel.Visible = false;
-    }
+		gameOverLabel.Visible = false;
+		gameOverReasonLabel.Visible = false;
+	}
 
 	// on play as black
 
 	private void OnPlayBlack()
 	{
-        game.PlayAsColor(Piece.Color.Black);
+		game.PlayAsColor(Piece.Color.Black);
 
-        // hide labels
+		// hide labels
 
-        gameOverLabel.Visible = false;
-        gameOverReasonLabel.Visible = false;
-    }
+		gameOverLabel.Visible = false;
+		gameOverReasonLabel.Visible = false;
+	}
 
 	// on play vs human
 
 	private void OnPlayHuman()
 	{
-        game.PlayAsColor(Piece.Color.White, true);
+		game.PlayAsColor(Piece.Color.White, true);
 
-        // hide labels
+		// hide labels
 
-        gameOverLabel.Visible = false;
-        gameOverReasonLabel.Visible = false;
-    }
+		gameOverLabel.Visible = false;
+		gameOverReasonLabel.Visible = false;
+	}
 
-    // on play ai
+	// on play ai
 
-    private void OnPlayAI()
+	private void OnPlayAI()
 	{
-        game.PlayAsColor(Piece.Color.None);
+		game.PlayAsColor(Piece.Color.None);
 
-        // hide labels
+		// hide labels
 
-        gameOverLabel.Visible = false;
-        gameOverReasonLabel.Visible = false;
-    }
+		gameOverLabel.Visible = false;
+		gameOverReasonLabel.Visible = false;
+	}
 
 	// on quit
 
@@ -147,5 +147,5 @@ public partial class UI : Control
 	public override void _Process(double delta)
 	{
 
-    }
+	}
 }

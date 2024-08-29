@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://c1tayja68tg44"]
+
+[ext_resource type="Script" path="res://Scripts/TableVisualizer.cs" id="1_8swqk"]
+
+[sub_resource type="Gradient" id="Gradient_m1sdg"]
+colors = PackedColorArray(0.0931928, 0.14164, 0.228454, 1, 0, 0.616421, 1, 1)
+
+[node name="TableVisualizer" type="Node2D"]
+position = Vector2(540, 120)
+script = ExtResource("1_8swqk")
+PieceType = 4
+gradient = SubResource("Gradient_m1sdg")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(420, 420)

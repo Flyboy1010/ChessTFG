@@ -5,17 +5,17 @@ using System.Diagnostics;
 
 public class Search
 {
-    // constants
+	// constants
 
-    private const int positiveInfinity = 9999999;
-    private const int negativeInfinity = -positiveInfinity;
-    private const int mateScore = 100000;
+	private const int positiveInfinity = 9999999;
+	private const int negativeInfinity = -positiveInfinity;
+	private const int mateScore = 100000;
 
-    private const int ttSizeInMb = 64;
+	private const int ttSizeInMb = 64;
 
-    // on search complete action
+	// on search complete action
 
-    public event System.Action<Move> onComplete;
+	public event System.Action<Move> onComplete;
 
 	// board
 
@@ -26,40 +26,40 @@ public class Search
 	private Move bestMoveFound;
 	private int bestEvalFound = negativeInfinity;
 
-    private Move bestMoveIteration;
-    private int bestEvalIteration;
+	private Move bestMoveIteration;
+	private int bestEvalIteration;
 
-    // search cancelled flag
+	// search cancelled flag
 
-    private bool isSearchCanceled;
+	private bool isSearchCanceled;
 
-    // transposition table
+	// transposition table
 
-    private TranspositionTable tt;
+	private TranspositionTable tt;
 
-    // ctor
+	// ctor
 
-    public Search()
+	public Search()
 	{
-        // transposition table
+		// transposition table
 
-        int sizeInEntries = (ttSizeInMb * 1024 * 1024) / TranspositionTable.Entry.GetSize();
-        tt = new TranspositionTable(sizeInEntries);
+		int sizeInEntries = (ttSizeInMb * 1024 * 1024) / TranspositionTable.Entry.GetSize();
+		tt = new TranspositionTable(sizeInEntries);
 	}
 
-    // set board
+	// set board
 
-    public void SetBoard(Board board)
-    {
-        this.board = board;
-    }
+	public void SetBoard(Board board)
+	{
+		this.board = board;
+	}
 
-    // cancell search
+	// cancell search
 
-    public void Cancel()
-    {
-        isSearchCanceled = true;
-    }
+	public void Cancel()
+	{
+		isSearchCanceled = true;
+	}
 
 	// get best move
 
@@ -72,300 +72,300 @@ public class Search
 
 	public void StartSearch()
 	{
-        // prepare the search
+		// prepare the search
 
 		bestMoveFound = Move.NullMove;
-        bestEvalFound = int.MinValue;
-        isSearchCanceled = false;
+		bestEvalFound = int.MinValue;
+		isSearchCanceled = false;
 
-        Stopwatch stopwatch = new Stopwatch();
+		Stopwatch stopwatch = new Stopwatch();
 
-        // iterative deepening
+		// iterative deepening
 
-        for (int depth = 1; depth < 100; depth++)
-        {
-            bestMoveIteration = Move.NullMove;
-            bestEvalIteration = negativeInfinity;
+		for (int depth = 1; depth < 100; depth++)
+		{
+			bestMoveIteration = Move.NullMove;
+			bestEvalIteration = negativeInfinity;
 
-            stopwatch.Start();
-            SearchMoves(depth, 0, negativeInfinity, positiveInfinity);
-            stopwatch.Stop();
+			stopwatch.Start();
+			SearchMoves(depth, 0, negativeInfinity, positiveInfinity);
+			stopwatch.Stop();
 
-            if (!bestMoveIteration.IsEqual(Move.NullMove))
-            {
-                bestMoveFound = bestMoveIteration;
-                bestEvalFound = bestEvalIteration;
-            }
+			if (!bestMoveIteration.IsEqual(Move.NullMove))
+			{
+				bestMoveFound = bestMoveIteration;
+				bestEvalFound = bestEvalIteration;
+			}
 
-            if (isSearchCanceled)
-            {
-                GD.Print("Search canceled at depth: " + depth);
-                GD.Print("Partial search result best move: " + Utils.FromMoveToString(bestMoveFound) + ", eval: " + bestEvalFound + ", time: " + stopwatch.ElapsedMilliseconds + "ms");
-                break;
-            }
-            else
-            {
-                if (Math.Abs(bestEvalIteration) >= mateScore - 1000)
-                {
-                    int numMovesToMate = Math.Abs(bestEvalIteration - mateScore);
-                    int numPlyToMate = (int)Math.Ceiling(numMovesToMate / 2f);
-                    GD.Print("Depth: " + depth + ", best move: " + Utils.FromMoveToString(bestMoveIteration) + ", eval: Mate in " + numPlyToMate + " ply, time: " + stopwatch.ElapsedMilliseconds + "ms");
+			if (isSearchCanceled)
+			{
+				GD.Print($"Search canceled at depth: {depth}");
+				GD.Print($"Partial search result best move: {Utils.FromMoveToString(bestMoveFound)}, eval: {bestEvalFound}, time: {stopwatch.ElapsedMilliseconds} ms");
+				break;
+			}
+			else
+			{
+				if (Math.Abs(bestEvalFound) >= mateScore - 1000)
+				{
+					int numPlyToMate = mateScore - Math.Abs(bestEvalFound);
+					int numMovesToMate = numPlyToMate / 2;
+					GD.Print($"Depth: {depth}, best move: {Utils.FromMoveToString(bestMoveFound)}, eval: Mate in {numPlyToMate} ply ({numMovesToMate} moves), time: {stopwatch.ElapsedMilliseconds} ms");
 
-                    if (numMovesToMate <= depth)
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    GD.Print("Depth: " + depth + ", best move: " + Utils.FromMoveToString(bestMoveIteration) + ", eval: " + bestEvalIteration + ", time: " + stopwatch.ElapsedMilliseconds + "ms");
-                }
-            }
-        }
+					if (numPlyToMate <= depth)
+					{
+						break;
+					}
+				}
+				else
+				{
+					GD.Print($"Depth: {depth}, best move: {Utils.FromMoveToString(bestMoveFound)}, eval: {bestEvalFound}, time: {stopwatch.ElapsedMilliseconds} ms");
+				}
+			}
+		}
 
-        GD.Print();
+		GD.Print();
 
-        // on search complete
+		// on search complete
 
-        onComplete?.Invoke(bestMoveFound);
+		onComplete?.Invoke(bestMoveFound);
 	}
 
-    // just search for captures
+	// just search for captures
 
-    private int QuiescenceSearch(int alpha, int beta)
-    {
-        // evaluate board
+	private int QuiescenceSearch(int alpha, int beta)
+	{
+		// evaluate board
 
-        int evaluation = Evaluation.EvaluateBoard(board, board.GetTurnColor());
+		int evaluation = Evaluation.EvaluateBoard(board, board.GetTurnColor());
 
-        if (evaluation >= beta) // Beta cutoff
-        {
-            return beta;
-        }
+		if (evaluation >= beta) // Beta cutoff
+		{
+			return beta;
+		}
 
-        alpha = Math.Max(alpha, evaluation); // Update alpha
+		alpha = Math.Max(alpha, evaluation); // Update alpha
 
-        // get moves just captures
+		// get moves just captures
 
-        List<Move> moves = MoveGeneration.GetAllLegalMovesByColor(board, board.GetTurnColor(), true);
+		List<Move> moves = MoveGeneration.GetAllLegalMovesByColor(board, board.GetTurnColor(), true);
 
-        // sort
+		// sort
 
-        SortMoves(moves, board.GetTurnColor(), Move.NullMove);
+		SortMoves(moves, board.GetTurnColor(), Move.NullMove);
 
-        // calculate eval
+		// calculate eval
 
-        foreach (Move move in moves)
-        {
-            board.MakeMove(move, true);
-            evaluation = -QuiescenceSearch(-beta, -alpha);
-            board.UndoMove(true);
+		foreach (Move move in moves)
+		{
+			board.MakeMove(move, true);
+			evaluation = -QuiescenceSearch(-beta, -alpha);
+			board.UndoMove(true);
 
-            if (evaluation >= beta) // Beta cutoff
-            {
-                return beta;
-            }
+			if (evaluation >= beta) // Beta cutoff
+			{
+				return beta;
+			}
 
-            alpha = Math.Max(alpha, evaluation); // Update alpha
-        }
+			alpha = Math.Max(alpha, evaluation); // Update alpha
+		}
 
-        return alpha;
-    }
+		return alpha;
+	}
 
-    // search moves
+	// search moves
 
-    public int SearchMoves(int depth, int plyFromRoot, int alpha, int beta)
-    {
-        // if search canceled
+	public int SearchMoves(int depth, int plyFromRoot, int alpha, int beta)
+	{
+		// if search canceled
 
-        if (isSearchCanceled)
-        {
-            return 0;
-        }
+		if (isSearchCanceled)
+		{
+			return 0;
+		}
 
-        // get zobrist from board
+		// get zobrist from board
 
-        ulong zobrist = board.GetZobrist();
+		ulong zobrist = board.GetZobrist();
 
-        // check the transposition table
+		// check the transposition table
 
-        int ttVal = tt.Lookup(zobrist, depth, alpha, beta);
-        if (ttVal != TranspositionTable.lookupFailed)
-        {
-            if (plyFromRoot == 0)
-            {
-                TranspositionTable.Entry tEntry = tt.GetEntry(zobrist);
-                bestMoveIteration = tEntry.move;
-                bestEvalIteration = tEntry.value;
-            }
+		int ttVal = tt.Lookup(zobrist, depth, alpha, beta);
+		if (ttVal != TranspositionTable.lookupFailed)
+		{
+			if (plyFromRoot == 0)
+			{
+				TranspositionTable.Entry tEntry = tt.GetEntry(zobrist);
+				bestMoveIteration = tEntry.move;
+				bestEvalIteration = tEntry.value;
+			}
 
-            return ttVal;
-        }
+			return ttVal;
+		}
 
-        // when reached 0 depth perform a quiescence search until a stable state (to get good results from evaluation)
+		// when reached 0 depth perform a quiescence search until a stable state (to get good results from evaluation)
 
-        if (depth == 0)
-        {
-            int result = QuiescenceSearch(alpha, beta);
-            return result;
-        }
+		if (depth == 0)
+		{
+			int result = QuiescenceSearch(alpha, beta);
+			return result;
+		}
 
-        // check checkmate
+		// check checkmate
 
-        List<Move> moves = MoveGeneration.GetAllLegalMovesByColor(board, board.GetTurnColor());
+		List<Move> moves = MoveGeneration.GetAllLegalMovesByColor(board, board.GetTurnColor());
 
-        if (moves.Count == 0)
-        {
-            if (MoveGeneration.IsKingInCheck(board, board.GetTurnColor()))
-            {
-                int result = -mateScore + plyFromRoot;
-                return result;
-            }
+		if (moves.Count == 0)
+		{
+			if (MoveGeneration.IsKingInCheck(board, board.GetTurnColor()))
+			{
+				int result = -mateScore + plyFromRoot;
+				return result;
+			}
 
-            // stale mate
+			// stale mate
 
-            return 0;
-        }
+			return 0;
+		}
 
-        // sort moves
+		// sort moves
 
-        Move hashMove;
+		Move hashMove;
 
-        if (plyFromRoot == 0)
-        {
-            hashMove = bestMoveFound;
-        }
-        else
-        {
-            TranspositionTable.Entry entry = tt.GetEntry(zobrist);
-            hashMove = entry.move;
-        }
+		if (plyFromRoot == 0)
+		{
+			hashMove = bestMoveFound;
+		}
+		else
+		{
+			TranspositionTable.Entry entry = tt.GetEntry(zobrist);
+			hashMove = entry.move;
+		}
 
-        SortMoves(moves, board.GetTurnColor(), hashMove);
+		SortMoves(moves, board.GetTurnColor(), hashMove);
 
-        // calculate eval
+		// calculate eval
 
-        TranspositionTable.NodeType nodeType = TranspositionTable.NodeType.UpperBound;
-        Move bestMoveInThisPosition = Move.NullMove;
+		TranspositionTable.NodeType nodeType = TranspositionTable.NodeType.UpperBound;
+		Move bestMoveInThisPosition = Move.NullMove;
 
-        for (int i = 0; i < moves.Count; i++)
-        {
-            board.MakeMove(moves[i], true);
+		for (int i = 0; i < moves.Count; i++)
+		{
+			board.MakeMove(moves[i], true);
 
-            // late move reduction
+			// late move reduction
 
-            int evaluation = 0;
-            bool needsFullSearch = true;
-            bool isCapture = moves[i].pieceTarget.type != Piece.Type.None;
-            bool isInCheck = MoveGeneration.IsKingInCheck(board, board.GetTurnColor());
+			int evaluation = 0;
+			bool needsFullSearch = true;
+			bool isCapture = moves[i].pieceTarget.type != Piece.Type.None;
+			bool isInCheck = MoveGeneration.IsKingInCheck(board, board.GetTurnColor());
 
-            if (i >= 3 && depth > 3 && !isCapture && !isInCheck)
-            {
-                const int reduction = 1;
-                evaluation = -SearchMoves(depth - 1 - reduction, plyFromRoot + 1, -beta, -alpha);
-                needsFullSearch = evaluation > alpha;
-            }
+			if (i >= 3 && depth > 3 && !isCapture && !isInCheck)
+			{
+				const int reduction = 2; // incremented to 2
+				evaluation = -SearchMoves(depth - 1 - reduction, plyFromRoot + 1, -beta, -alpha);
+				needsFullSearch = evaluation > alpha;
+			}
 
-            if (needsFullSearch)
-            {
-                evaluation = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
-            }
+			if (needsFullSearch)
+			{
+				evaluation = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
+			}
 
-            board.UndoMove(true);
+			board.UndoMove(true);
 
-            // if search canceled
+			// if search canceled
 
-            if (isSearchCanceled)
-            {
-                return 0;
-            }
+			if (isSearchCanceled)
+			{
+				return 0;
+			}
 
-            if (evaluation >= beta) // Beta cutoff
-            {
-                tt.Store(zobrist, depth, beta, TranspositionTable.NodeType.LowerBound, moves[i]);
-                return beta;
-            }
+			if (evaluation >= beta) // Beta cutoff
+			{
+				tt.Store(zobrist, depth, beta, TranspositionTable.NodeType.LowerBound, moves[i]);
+				return beta;
+			}
 
-            if (evaluation > alpha)
-            {
-                nodeType = TranspositionTable.NodeType.Exact;
-                bestMoveInThisPosition = moves[i];
+			if (evaluation > alpha)
+			{
+				nodeType = TranspositionTable.NodeType.Exact;
+				bestMoveInThisPosition = moves[i];
 
-                alpha = evaluation;
+				alpha = evaluation;
 
-                if (plyFromRoot == 0)
-                {
-                    bestMoveIteration = moves[i];
-                    bestEvalIteration = evaluation;
-                }
-            }
-        }
+				if (plyFromRoot == 0)
+				{
+					bestMoveIteration = moves[i];
+					bestEvalIteration = evaluation;
+				}
+			}
+		}
 
-        tt.Store(zobrist, depth, alpha, nodeType, bestMoveInThisPosition);
+		tt.Store(zobrist, depth, alpha, nodeType, bestMoveInThisPosition);
 
-        return alpha;
-    }
+		return alpha;
+	}
 
-    // sort moves
+	// sort moves
 
-    private void SortMoves(List<Move> moves, Piece.Color color, Move hashMove)
-    {
-        int[] moveScore = new int[moves.Count];
+	private void SortMoves(List<Move> moves, Piece.Color color, Move hashMove)
+	{
+		int[] moveScore = new int[moves.Count];
 
-        for (int i = 0; i < moves.Count; i++)
-        {
-            moveScore[i] = 0;
+		for (int i = 0; i < moves.Count; i++)
+		{
+			moveScore[i] = 0;
 
-            // check if is the hash move
+			// check if is the hash move
 
-            if (moves[i].IsEqual(hashMove))
-            {
-                // bonus for hash move
+			if (moves[i].IsEqual(hashMove))
+			{
+				// bonus for hash move
 
-                moveScore[i] += 10000000;
-                continue;
-            }
+				moveScore[i] += 10000000;
+				continue;
+			}
 
-            // check if it is a capture
+			// check if it is a capture
 
-            Piece.Type pieceTypeTarget = moves[i].pieceTarget.type;
-            Piece.Type pieceTypeSource = moves[i].pieceSource.type;
+			Piece.Type pieceTypeTarget = moves[i].pieceTarget.type;
+			Piece.Type pieceTypeSource = moves[i].pieceSource.type;
 
-            if (pieceTypeTarget != Piece.Type.None)
-            {
-                // bonus for capture
+			if (pieceTypeTarget != Piece.Type.None)
+			{
+				// bonus for capture
 
-                moveScore[i] += 10 * Evaluation.GetPieceValue(pieceTypeTarget) - Evaluation.GetPieceValue(pieceTypeSource);
-            }
-            else
-            {
-                // bonus for moving the piece into a better square
+				moveScore[i] += 10 * Evaluation.GetPieceValue(pieceTypeTarget) - Evaluation.GetPieceValue(pieceTypeSource);
+			}
+			else
+			{
+				// bonus for moving the piece into a better square
 
-                int[] table = PieceSquareTables.GetTable(pieceTypeSource);
-                moveScore[i] += PieceSquareTables.Read(table, moves[i].squareTargetIndex, color) - PieceSquareTables.Read(table, moves[i].squareSourceIndex, color);
-            }
+				int[] table = PieceTables.GetTable(pieceTypeSource);
+				moveScore[i] += PieceTables.Read(table, moves[i].squareTargetIndex, color) - PieceTables.Read(table, moves[i].squareSourceIndex, color);
+			}
 
-            // bonus for promotion
+			// bonus for promotion
 
-            if (moves[i].flags == Move.Flags.Promotion)
-            {
-                moveScore[i] += Evaluation.GetPieceValue(moves[i].promotionPieceType);
-            }
-        }
+			if (moves[i].flags == Move.Flags.Promotion)
+			{
+				moveScore[i] += Evaluation.GetPieceValue(moves[i].promotionPieceType);
+			}
+		}
 
-        // Sort the moves list based on scores
+		// Sort the moves list based on scores
 
-        for (int i = 0; i < moves.Count - 1; i++)
-        {
-            for (int j = i + 1; j > 0; j--)
-            {
-                int swapIndex = j - 1;
-                if (moveScore[swapIndex] < moveScore[j])
-                {
-                    (moves[j], moves[swapIndex]) = (moves[swapIndex], moves[j]);
-                    (moveScore[j], moveScore[swapIndex]) = (moveScore[swapIndex], moveScore[j]);
-                }
-            }
-        }
-    }
+		for (int i = 0; i < moves.Count - 1; i++)
+		{
+			for (int j = i + 1; j > 0; j--)
+			{
+				int swapIndex = j - 1;
+				if (moveScore[swapIndex] < moveScore[j])
+				{
+					(moves[j], moves[swapIndex]) = (moves[swapIndex], moves[j]);
+					(moveScore[j], moveScore[swapIndex]) = (moveScore[swapIndex], moveScore[j]);
+				}
+			}
+		}
+	}
 }

@@ -14,7 +14,7 @@ shader = ExtResource("6_8nyfd")
 shader_parameter/u_colorWhite = Color(0.878, 0.796, 0.71, 1)
 shader_parameter/u_colorBlack = Color(0.584, 0.42, 0.353, 1)
 
-[node name="Game" type="Node2D"]
+[node name="Game" type="Node"]
 script = ExtResource("1_ebuse")
 
 [node name="BoardGraphics" type="Node2D" parent="."]
@@ -117,6 +117,7 @@ theme = ExtResource("8_65nis")
 text = "Quit"
 
 [node name="DebugInfo" type="Control" parent="UI"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -150,6 +151,7 @@ text = "Last move: -"
 vertical_alignment = 1
 
 [node name="ZobristInfo" type="Control" parent="UI"]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_left = 330.0

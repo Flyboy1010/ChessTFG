@@ -4,66 +4,66 @@ using System.Threading.Tasks;
 
 public class PlayerAI : Player
 {
-    // constants
+	// constants
 
-    private const int searchTime = 3000; // ms
+	private const int searchTime = 3000; // ms
 
-    // board
+	// board
 
-    private Board board;
+	private Board board;
 
-    // search
+	// search
 
-    private Search search;
+	private Search search;
 
-    // move selected
+	// move selected
 
-    private Move moveSelected = Move.NullMove;
-    private bool moveFound = false;
+	private Move moveSelected = Move.NullMove;
+	private bool moveFound = false;
 
-    // ctor
+	// ctor
 
-    public PlayerAI(Board board)
-    {
-        // init
+	public PlayerAI(Board board)
+	{
+		// init
 
-        this.board = board;
-        search = new Search();
-        search.onComplete += OnSearchCompleted;
-    }
+		this.board = board;
+		search = new Search();
+		search.onComplete += OnSearchCompleted;
+	}
 
-    public override void NotifyTurnToMove()
-    {
-        moveFound = false;
-        Board boardCopy = board.Copy();
-        search.SetBoard(boardCopy);
+	public override void NotifyTurnToMove()
+	{
+		moveFound = false;
+		Board boardCopy = board.Copy();
+		search.SetBoard(boardCopy);
 
-        // Start a new Task to calculate the best move asynchronously
+		// Start a new Task to calculate the best move asynchronously
 
-        Task.Run(() =>
-        {
-            search.StartSearch();
-        });
+		Task.Run(() =>
+		{
+			search.StartSearch();
+		});
 
-        // 
+		// 
 
-        Task.Delay(searchTime).ContinueWith((t) => 
-        {
-            search.Cancel();
-        });
-    }
+		Task.Delay(searchTime).ContinueWith((t) => 
+		{
+			search.Cancel();
+		});
+	}
 
-    private void OnSearchCompleted(Move move)
-    {
-        moveSelected = move;
-        moveFound = true;
-    }
+	private void OnSearchCompleted(Move move)
+	{
+		moveSelected = move;
+		moveFound = true;
+	}
 
-    public override void Update()
-    {
-        if (moveFound)
-        {
-            ChoseMove(moveSelected, true);
-        }
-    }
+	public override void Update()
+	{
+		if (moveFound)
+		{
+			ChoseMove(moveSelected, true);
+		}
+	}
 }

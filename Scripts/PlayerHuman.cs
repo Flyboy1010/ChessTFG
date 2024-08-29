@@ -4,237 +4,237 @@ using System.Collections.Generic;
 
 public class PlayerHuman : Player
 {
-    private enum InputState
-    {
-        Idle,
-        Dragging,
-        PieceSelected
-    }
+	private enum InputState
+	{
+		Idle,
+		Dragging,
+		PieceSelected
+	}
 
-    // player state
+	// player state
 
-    private InputState inputState = InputState.Idle;
+	private InputState inputState = InputState.Idle;
 
-    // board
+	// board
 
-    private Board board;
+	private Board board;
 
-    // board graphics
+	// board graphics
 
-    private BoardGraphics boardGraphics;
+	private BoardGraphics boardGraphics;
 
-    // piece selection helpers
+	// piece selection helpers
 
-    private int pieceSelectedIndex = -1; // -1 means nothing selected
-    private List<Move> pieceSelectedMoves = null;
+	private int pieceSelectedIndex = -1; // -1 means nothing selected
+	private List<Move> pieceSelectedMoves = null;
 
-    // ctor
+	// ctor
 
-    public PlayerHuman(Board board, BoardGraphics boardGraphics)
-    {
-        // init
+	public PlayerHuman(Board board, BoardGraphics boardGraphics)
+	{
+		// init
 
-        this.board = board;
-        this.boardGraphics = boardGraphics;
-    }
+		this.board = board;
+		this.boardGraphics = boardGraphics;
+	}
 
-    // when notified
+	// when notified
 
-    public override void NotifyTurnToMove()
-    {
+	public override void NotifyTurnToMove()
+	{
 
-    }
+	}
 
-    // on update
+	// on update
 
-    public override void Update()
-    {
-        // handle everything related to move selection
+	public override void Update()
+	{
+		// handle everything related to move selection
 
-        // get the mouse coordinates
+		// get the mouse coordinates
 
-        Vector2 mouse = boardGraphics.GetLocalMousePosition();
+		Vector2 mouse = boardGraphics.GetLocalMousePosition();
 
-        // get the square the mouse is on
+		// get the square the mouse is on
 
-        bool isOnSquare = boardGraphics.TryGetSquareIndexFromCoords(mouse, out int squareIndex);
+		bool isOnSquare = boardGraphics.TryGetSquareIndexFromCoords(mouse, out int squareIndex);
 
-        // state machine
+		// state machine
 
-        switch (inputState)
-        {
-            case InputState.Idle:
-                HandlePieceSelection(squareIndex, isOnSquare);
-                break;
-            case InputState.Dragging:
-                HandleDragMovement(mouse, squareIndex, isOnSquare);
-                break;
-            case InputState.PieceSelected:
-                HandleClickMovement(squareIndex, isOnSquare);
-                break;
-        }
-    }
+		switch (inputState)
+		{
+			case InputState.Idle:
+				HandlePieceSelection(squareIndex, isOnSquare);
+				break;
+			case InputState.Dragging:
+				HandleDragMovement(mouse, squareIndex, isOnSquare);
+				break;
+			case InputState.PieceSelected:
+				HandleClickMovement(squareIndex, isOnSquare);
+				break;
+		}
+	}
 
-    private void HandlePieceSelection(int squareIndex, bool isOnSquare)
-    {
-        // the first frame you click
+	private void HandlePieceSelection(int squareIndex, bool isOnSquare)
+	{
+		// the first frame you click
 
-        if (Input.IsActionJustPressed("Select"))
-        {
-            if (isOnSquare)
-            {
-                // get the piece
+		if (Input.IsActionJustPressed("Select"))
+		{
+			if (isOnSquare)
+			{
+				// get the piece
 
-                Piece piece = board.GetPiece(squareIndex);
+				Piece piece = board.GetPiece(squareIndex);
 
-                // if not none then select it
+				// if not none then select it
 
-                if (piece.type != Piece.Type.None && piece.color == board.GetTurnColor())
-                {
-                    // select piece
+				if (piece.type != Piece.Type.None && piece.color == board.GetTurnColor())
+				{
+					// select piece
 
-                    pieceSelectedIndex = squareIndex;
-                    pieceSelectedMoves = MoveGeneration.GetLegalMoves(board, squareIndex);
+					pieceSelectedIndex = squareIndex;
+					pieceSelectedMoves = MoveGeneration.GetLegalMoves(board, squareIndex);
 
-                    // highlight square
+					// highlight square
 
-                    boardGraphics.HightlightSquare(squareIndex);
+					boardGraphics.HightlightSquare(squareIndex);
 
-                    // set hint moves
+					// set hint moves
 
-                    boardGraphics.SetHintMoves(pieceSelectedMoves);
+					boardGraphics.SetHintMoves(pieceSelectedMoves);
 
-                    // change state
+					// change state
 
-                    inputState = InputState.Dragging;
-                }
-            }
-        }
-    }
+					inputState = InputState.Dragging;
+				}
+			}
+		}
+	}
 
-    private void HandleDragMovement(Vector2 mouse, int squareIndex, bool isOnSquare)
-    {
-        // move the piece selected to the mouse position
+	private void HandleDragMovement(Vector2 mouse, int squareIndex, bool isOnSquare)
+	{
+		// move the piece selected to the mouse position
 
-        boardGraphics.SetPieceSpritePosition(pieceSelectedIndex, mouse);
+		boardGraphics.SetPieceSpritePosition(pieceSelectedIndex, mouse);
 
-        // select square
+		// select square
 
-        boardGraphics.SelectSquare(isOnSquare ? squareIndex : -1);
+		boardGraphics.SelectSquare(isOnSquare ? squareIndex : -1);
 
-        // if stop holding
+		// if stop holding
 
-        if (Input.IsActionJustReleased("Select"))
-        {
-            if (isOnSquare)
-            {
-                // if the square is a valid move
+		if (Input.IsActionJustReleased("Select"))
+		{
+			if (isOnSquare)
+			{
+				// if the square is a valid move
 
-                foreach (Move move in pieceSelectedMoves)
-                {
-                    if (move.squareTargetIndex == squareIndex)
-                    {
-                        // chose the move (no animation)
+				foreach (Move move in pieceSelectedMoves)
+				{
+					if (move.squareTargetIndex == squareIndex)
+					{
+						// chose the move (no animation)
 
-                        ChoseMove(move, false);
+						ChoseMove(move, false);
 
-                        // reset board state
+						// reset board state
 
-                        inputState = InputState.Idle;
+						inputState = InputState.Idle;
 
-                        // move selected
+						// move selected
 
-                        return;
-                    }
-                }
-            }
+						return;
+					}
+				}
+			}
 
-            // disable selected square
+			// disable selected square
 
-            boardGraphics.SelectSquare(-1);
+			boardGraphics.SelectSquare(-1);
 
-            // update graphics
+			// update graphics
 
-            boardGraphics.UpdateGraphics();
+			boardGraphics.UpdateGraphics();
 
-            // go to piece selected state
+			// go to piece selected state
 
-            inputState = InputState.PieceSelected;
-        }
-    }
+			inputState = InputState.PieceSelected;
+		}
+	}
 
-    private void HandleClickMovement(int squareIndex, bool isOnSquare)
-    {
-        // the first frame you click
+	private void HandleClickMovement(int squareIndex, bool isOnSquare)
+	{
+		// the first frame you click
 
-        if (Input.IsActionJustPressed("Select"))
-        {
-            if (isOnSquare)
-            {
-                // if the square is a valid move
+		if (Input.IsActionJustPressed("Select"))
+		{
+			if (isOnSquare)
+			{
+				// if the square is a valid move
 
-                foreach (Move move in pieceSelectedMoves)
-                {
-                    if (move.squareTargetIndex == squareIndex)
-                    {
-                        // select the move
+				foreach (Move move in pieceSelectedMoves)
+				{
+					if (move.squareTargetIndex == squareIndex)
+					{
+						// select the move
 
-                        ChoseMove(move, true);
+						ChoseMove(move, true);
 
-                        // reset board state
+						// reset board state
 
-                        inputState = InputState.Idle;
+						inputState = InputState.Idle;
 
-                        // move selected
+						// move selected
 
-                        return;
-                    }
-                }
+						return;
+					}
+				}
 
-                // if the move is not legal then check if another piece is selected
+				// if the move is not legal then check if another piece is selected
 
-                // get the piece
+				// get the piece
 
-                Piece piece = board.GetPiece(squareIndex);
+				Piece piece = board.GetPiece(squareIndex);
 
-                // if not none then select it
+				// if not none then select it
 
-                if (piece.type != Piece.Type.None && piece.color == board.GetTurnColor())
-                {
-                    // select piece
+				if (piece.type != Piece.Type.None && piece.color == board.GetTurnColor())
+				{
+					// select piece
 
-                    pieceSelectedIndex = squareIndex;
-                    pieceSelectedMoves = MoveGeneration.GetLegalMoves(board, squareIndex);
+					pieceSelectedIndex = squareIndex;
+					pieceSelectedMoves = MoveGeneration.GetLegalMoves(board, squareIndex);
 
-                    // highlight square
+					// highlight square
 
-                    boardGraphics.HightlightSquare(squareIndex);
+					boardGraphics.HightlightSquare(squareIndex);
 
-                    // set hint moves
+					// set hint moves
 
-                    boardGraphics.SetHintMoves(pieceSelectedMoves);
+					boardGraphics.SetHintMoves(pieceSelectedMoves);
 
-                    // change state to holding the piece
+					// change state to holding the piece
 
-                    inputState = InputState.Dragging;
+					inputState = InputState.Dragging;
 
-                    // exit
+					// exit
 
-                    return;
-                }
-            }
+					return;
+				}
+			}
 
-            // stop highlighting square
+			// stop highlighting square
 
-            boardGraphics.HightlightSquare(-1);
+			boardGraphics.HightlightSquare(-1);
 
-            // disable hint moves
+			// disable hint moves
 
-            boardGraphics.SetHintMoves(null);
+			boardGraphics.SetHintMoves(null);
 
-            // go back to idle state
+			// go back to idle state
 
-            inputState = InputState.Idle;
-        }
-    }
+			inputState = InputState.Idle;
+		}
+	}
 }

@@ -5,36 +5,36 @@ public class TranspositionTable
 {
 	// node type
 
-    public enum NodeType
-    {
-        Exact,  // Exact score
-        LowerBound, // Lower bound (beta cut-off)
-        UpperBound // Upper bound (alpha cut-off)
-    }
+	public enum NodeType
+	{
+		Exact,  // Exact score
+		LowerBound, // Lower bound (beta cut-off)
+		UpperBound // Upper bound (alpha cut-off)
+	}
 
 	// transposition entry struct
 
-    public struct Entry
-    {
-        public ulong key;
-        public byte depth;
-        public int value;
-        public NodeType nodeType;
+	public struct Entry
+	{
+		public ulong key;
+		public byte depth;
+		public int value;
+		public NodeType nodeType;
 		public Move move;
 
 		public static int GetSize()
 		{
 			return System.Runtime.InteropServices.Marshal.SizeOf<Entry>();
-        }
-    }
+		}
+	}
 
 	// lookup failed value
 
 	public const int lookupFailed = int.MinValue;
 
-    // entries
+	// entries
 
-    private Entry[] entries;
+	private Entry[] entries;
 
 	// ctor
 
@@ -47,9 +47,9 @@ public class TranspositionTable
 
 	public Entry GetEntry(ulong key)
 	{
-        int index = (int)(key % (ulong)entries.Length);
+		int index = (int)(key % (ulong)entries.Length);
 		return entries[index];
-    }
+	}
 
 	// store entry
 

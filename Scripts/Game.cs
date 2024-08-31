@@ -100,26 +100,6 @@ public partial class Game : Node
 		playerWhite.onMoveChosen += OnMoveChosen;
 		playerBlack = new PlayerAI(board);
 		playerBlack.onMoveChosen += OnMoveChosen;
-
-		// test code
-		//Task.Run(() =>
-		//{
-		//	Board newBoard = new Board();
-		//	newBoard.LoadFenString("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-		//	ulong[] testNodes = new ulong[] { 48, 2039, 97862, 4085603, 193690690, 8031647685 };
-
-		//	for (int depth = 1; depth <= 6; depth++)
-		//	{
-		//		ulong nodes = MoveGeneration.TestPositions(newBoard, Piece.Color.White, depth);
-
-		//		string output = $"Depth {depth}, nodes {nodes} ";
-		//		output += (nodes == testNodes[depth - 1]) ? "✅" : $"❌ (expected {testNodes[depth - 1]})";
-
-		//		GD.Print(output);
-		//	}
-
-		//	GD.Print("test finished");
-		//});
 	}
 
 	// get the board

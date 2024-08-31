@@ -183,18 +183,28 @@ public class Search
 			return 0;
 		}
 
-		// get zobrist from board
+		// get zobristKey from board
 
-		ulong zobrist = board.GetZobrist();
+		ulong zobristKey = board.GetZobristKey();
+
+		// check for repetition
+
+		if (plyFromRoot > 0)
+		{
+			if (board.GetRepetitions() >= 2)
+			{
+				return 0;
+			}
+		}
 
 		// check the transposition table
 
-		int ttVal = tt.Lookup(zobrist, depth, alpha, beta);
+		int ttVal = tt.Lookup(zobristKey, depth, alpha, beta);
 		if (ttVal != TranspositionTable.lookupFailed)
 		{
 			if (plyFromRoot == 0)
 			{
-				TranspositionTable.Entry tEntry = tt.GetEntry(zobrist);
+				TranspositionTable.Entry tEntry = tt.GetEntry(zobristKey);
 				bestMoveIteration = tEntry.move;
 				bestEvalIteration = tEntry.value;
 			}
@@ -237,7 +247,7 @@ public class Search
 		}
 		else
 		{
-			TranspositionTable.Entry entry = tt.GetEntry(zobrist);
+			TranspositionTable.Entry entry = tt.GetEntry(zobristKey);
 			hashMove = entry.move;
 		}
 
@@ -250,7 +260,7 @@ public class Search
 
 		for (int i = 0; i < moves.Count; i++)
 		{
-			board.MakeMove(moves[i], true);
+			board.MakeMove(moves[i]);
 
 			// late move reduction
 
@@ -271,7 +281,7 @@ public class Search
 				evaluation = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
 			}
 
-			board.UndoMove(true);
+			board.UndoMove();
 
 			// if search canceled
 
@@ -282,7 +292,7 @@ public class Search
 
 			if (evaluation >= beta) // Beta cutoff
 			{
-				tt.Store(zobrist, depth, beta, TranspositionTable.NodeType.LowerBound, moves[i]);
+				tt.Store(zobristKey, depth, beta, TranspositionTable.NodeType.LowerBound, moves[i]);
 				return beta;
 			}
 
@@ -301,7 +311,7 @@ public class Search
 			}
 		}
 
-		tt.Store(zobrist, depth, alpha, nodeType, bestMoveInThisPosition);
+		tt.Store(zobristKey, depth, alpha, nodeType, bestMoveInThisPosition);
 
 		return alpha;
 	}

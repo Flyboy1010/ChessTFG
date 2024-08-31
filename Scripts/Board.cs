@@ -33,8 +33,8 @@ public class Board
 
 	// hash map with all the zobrist positions and the times it occured
 
-	private ulong zobrist;
-	private Dictionary<ulong, int> zobristHistory = new Dictionary<ulong, int>();
+	private ulong zobristKey;
+	private Dictionary<ulong, int> repetitionTable = new Dictionary<ulong, int>();
 
 	// current state
 
@@ -74,9 +74,9 @@ public class Board
 					break;
 			}
 
-			// modify zobrist hash
+			// modify zobristKey hash
 
-			zobrist ^= ZobristHashing.GetPieceKey(index, piecePrevious);
+			zobristKey ^= ZobristHashing.GetPieceKey(index, piecePrevious);
 		}
 
 		// handle new piece
@@ -93,9 +93,9 @@ public class Board
 					break;
 			}
 
-			// modify zobrist hash
+			// modify zobristKey hash
 
-			zobrist ^= ZobristHashing.GetPieceKey(index, piece);
+			zobristKey ^= ZobristHashing.GetPieceKey(index, piece);
 		}
 
 		// set the piece
@@ -137,20 +137,20 @@ public class Board
 		return currentBoardState.GetTurnColor();
 	}
 
-	// get zobrist
+	// get zobristKey
 
-	public ulong GetZobrist()
+	public ulong GetZobristKey()
 	{
-		return zobrist;
+		return zobristKey;
 	}
 
 	// get repetitions
 
 	public int GetRepetitions()
 	{
-		if (zobristHistory.ContainsKey(zobrist))
+		if (repetitionTable.ContainsKey(zobristKey))
 		{
-			return zobristHistory[zobrist];
+			return repetitionTable[zobristKey];
 		}
 
 		return 0;
@@ -165,8 +165,8 @@ public class Board
 		board.piecesIndicesWhite.AddRange(piecesIndicesWhite.ToArray());
 		board.piecesIndicesBlack.AddRange(piecesIndicesBlack.ToArray());
 		board.currentBoardState = currentBoardState;
-		board.zobrist = zobrist;
-		board.zobristHistory = new Dictionary<ulong, int>(zobristHistory);
+		board.zobristKey = zobristKey;
+		board.repetitionTable = new Dictionary<ulong, int>(repetitionTable);
 
 		return board;
 	}
@@ -198,7 +198,7 @@ public class Board
 
 		boardStates.Clear();
 		moves.Clear();
-		zobristHistory.Clear();
+		repetitionTable.Clear();
 
 		// split fen string
 
@@ -308,10 +308,10 @@ public class Board
 			currentBoardState.SetEnPassantSquareIndex(column + row * 8);
 		}
 
-		// zobrist position
+		// zobristKey position
 
-		zobrist = ZobristHashing.GetKey(this);
-		zobristHistory[zobrist] = 1;
+		zobristKey = ZobristHashing.GetKey(this);
+		repetitionTable[zobristKey] = 1;
 	}
 
 	// make move
@@ -462,40 +462,40 @@ public class Board
 		Piece.Color turnColor = currentBoardState.GetTurnColor();
 		currentBoardState.SetTurnColor(Piece.GetOppositeColor(turnColor));
 
-		// update zobrist special flags
+		// update zobristKey special flags
 
 		if (previousBoardState.IsEnPassantAvailable() != currentBoardState.IsEnPassantAvailable())
 		{
-			zobrist ^= ZobristHashing.GetEnPassantKey();
+			zobristKey ^= ZobristHashing.GetEnPassantKey();
 		}
 
 		for (int i = 0; i < 2; i++)
 		{
 			if (previousBoardState.CanCastleShort((Piece.Color)(i + 1)) != currentBoardState.CanCastleShort((Piece.Color)(i + 1)))
 			{
-				zobrist ^= ZobristHashing.GetShortCastleKey((Piece.Color)(i + 1));
+				zobristKey ^= ZobristHashing.GetShortCastleKey((Piece.Color)(i + 1));
 			}
 
 			if (previousBoardState.CanCastleLong((Piece.Color)(i + 1)) != currentBoardState.CanCastleLong((Piece.Color)(i + 1)))
 			{
-				zobrist ^= ZobristHashing.GetLongCastleKey((Piece.Color)(i + 1));
+				zobristKey ^= ZobristHashing.GetLongCastleKey((Piece.Color)(i + 1));
 			}
 		}
 
-		zobrist ^= ZobristHashing.GetTurnColorKey(previousBoardState.GetTurnColor());
-		zobrist ^= ZobristHashing.GetTurnColorKey(currentBoardState.GetTurnColor());
+		zobristKey ^= ZobristHashing.GetTurnColorKey(previousBoardState.GetTurnColor());
+		zobristKey ^= ZobristHashing.GetTurnColorKey(currentBoardState.GetTurnColor());
 
-		// add the current zobrist to the history
+		// add the current zobristKey to the history
 
 		if (!isTesting)
 		{
-			if (zobristHistory.ContainsKey(zobrist))
+			if (repetitionTable.ContainsKey(zobristKey))
 			{
-				zobristHistory[zobrist]++;
+				repetitionTable[zobristKey]++;
 			}
 			else
 			{
-				zobristHistory[zobrist] = 1;
+				repetitionTable[zobristKey] = 1;
 			}
 		}
 	}
@@ -506,19 +506,19 @@ public class Board
 	{
 		if (boardStates.Count > 0)
 		{
-			// remove the current zobrist
+			// remove the current zobristKey
 
 			if (!isTesting)
 			{
-				if (zobristHistory.TryGetValue(zobrist, out int count))
+				if (repetitionTable.TryGetValue(zobristKey, out int count))
 				{
 					if (count - 1 <= 0)
 					{
-						zobristHistory.Remove(zobrist);
+						repetitionTable.Remove(zobristKey);
 					}
 					else
 					{
-						zobristHistory[zobrist] = count - 1;
+						repetitionTable[zobristKey] = count - 1;
 					}
 				}
 			}
@@ -589,28 +589,28 @@ public class Board
 					break;
 			}
 
-			// update zobrist
+			// update zobristKey
 
 			if (currentBoardState.IsEnPassantAvailable() != previousBoardState.IsEnPassantAvailable())
 			{
-				zobrist ^= ZobristHashing.GetEnPassantKey();
+				zobristKey ^= ZobristHashing.GetEnPassantKey();
 			}
 
 			for (int i = 0; i < 2; i++)
 			{
 				if (previousBoardState.CanCastleShort((Piece.Color)(i + 1)) != currentBoardState.CanCastleShort((Piece.Color)(i + 1)))
 				{
-					zobrist ^= ZobristHashing.GetShortCastleKey((Piece.Color)(i + 1));
+					zobristKey ^= ZobristHashing.GetShortCastleKey((Piece.Color)(i + 1));
 				}
 
 				if (previousBoardState.CanCastleLong((Piece.Color)(i + 1)) != currentBoardState.CanCastleLong((Piece.Color)(i + 1)))
 				{
-					zobrist ^= ZobristHashing.GetLongCastleKey((Piece.Color)(i + 1));
+					zobristKey ^= ZobristHashing.GetLongCastleKey((Piece.Color)(i + 1));
 				}
 			}
 
-			zobrist ^= ZobristHashing.GetTurnColorKey(currentBoardState.GetTurnColor());
-			zobrist ^= ZobristHashing.GetTurnColorKey(previousBoardState.GetTurnColor());
+			zobristKey ^= ZobristHashing.GetTurnColorKey(currentBoardState.GetTurnColor());
+			zobristKey ^= ZobristHashing.GetTurnColorKey(previousBoardState.GetTurnColor());
 
 			// update current board state to previous
 

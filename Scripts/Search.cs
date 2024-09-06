@@ -70,7 +70,7 @@ public class Search
 
 	// start search
 
-	public void StartSearch()
+	public void Start()
 	{
 		// prepare the search
 
@@ -187,11 +187,11 @@ public class Search
 
 		ulong zobristKey = board.GetZobristKey();
 
-		// check for repetition
+		// check for repetition & half move count
 
 		if (plyFromRoot > 0)
 		{
-			if (board.GetRepetitions() >= 2)
+			if (board.GetRepetitions() >= 2 || board.GetHalfMoveCount() >= 100)
 			{
 				return 0;
 			}

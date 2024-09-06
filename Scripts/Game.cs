@@ -12,7 +12,8 @@ public partial class Game : Node
 		WhiteMated,
 		BlackMated,
 		Drowned,
-		Repetition
+		Repetition,
+		FiftyMoveRule
 	}
 
 	// game state machine
@@ -259,16 +260,23 @@ public partial class Game : Node
 
 					isGameOver = true;
 				}
-
-				// 3 fold repetition
-
-				if (board.GetRepetitions() >= 3)
+				else
 				{
-					EmitSignal(SignalName.OnGameOver, (int)GameOverReason.Repetition);
-					isGameOver = true;
+					// 3 fold repetition
+
+					if (board.GetRepetitions() >= 3)
+					{
+						EmitSignal(SignalName.OnGameOver, (int)GameOverReason.Repetition);
+						isGameOver = true;
+					}
+					else if (board.GetHalfMoveCount() >= 100)// fifty move
+					{
+						EmitSignal(SignalName.OnGameOver, (int)GameOverReason.FiftyMoveRule);
+						isGameOver = true;
+					}
 				}
 
-				// if the games continues
+				// check if the games continues
 
 				if (!isGameOver)
 				{

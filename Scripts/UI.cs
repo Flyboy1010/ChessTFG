@@ -48,7 +48,10 @@ public partial class UI : Control
 				gameOverReasonLabel.Text = "Draw by drowned";
 				break;
 			case Game.GameOverReason.Repetition:
-				gameOverReasonLabel.Text = "Draw by repetition";
+				gameOverReasonLabel.Text = "Draw by 3-fold repetition";
+				break;
+			case Game.GameOverReason.FiftyMoveRule:
+				gameOverReasonLabel.Text = "Draw by fifty-move rule";
 				break;
 		}
 

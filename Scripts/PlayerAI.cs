@@ -42,10 +42,10 @@ public class PlayerAI : Player
 
 		Task.Run(() =>
 		{
-			search.StartSearch();
+			search.Start();
 		});
 
-		// 
+		// cancels the search
 
 		Task.Delay(searchTime).ContinueWith((t) => 
 		{

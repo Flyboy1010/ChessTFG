@@ -33,6 +33,10 @@ public struct BoardState
 	private bool canCastleShortBlack = false;
 	private bool canCastleLongBlack = false;
 
+	// half move count
+
+	private int halfMoveCount = 0;
+
 	// ctor
 
 	public BoardState()
@@ -83,6 +87,18 @@ public struct BoardState
 	public Piece.Color GetEnPassantColor()
 	{
 		return doublePushedPawnColor;
+	}
+
+	// fifty move count
+
+	public void SetHalfMoveCount(int count)
+	{
+		halfMoveCount = count;
+	}
+
+	public int GetHalfMoveCount()
+	{
+		return halfMoveCount;
 	}
 
 	// get if you can castle

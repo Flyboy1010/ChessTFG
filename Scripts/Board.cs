@@ -14,7 +14,7 @@ public class Board
 
 	// start fen string
 
-	public static readonly string StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
+	public static readonly string StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 	// promotion piece
 
@@ -154,6 +154,13 @@ public class Board
 		}
 
 		return 0;
+	}
+
+	// get half move count
+
+	public int GetHalfMoveCount()
+	{
+		return currentBoardState.GetHalfMoveCount();
 	}
 
 	// copy the board
@@ -307,6 +314,11 @@ public class Board
 
 			currentBoardState.SetEnPassantSquareIndex(column + row * 8);
 		}
+
+		// set half move count
+
+		int halfMoveCount = subFEN[4].ToInt();
+		currentBoardState.SetHalfMoveCount(halfMoveCount);
 
 		// zobristKey position
 
@@ -484,6 +496,17 @@ public class Board
 
 		zobristKey ^= ZobristHashing.GetTurnColorKey(previousBoardState.GetTurnColor());
 		zobristKey ^= ZobristHashing.GetTurnColorKey(currentBoardState.GetTurnColor());
+
+		// update half move count
+
+		int halfMoveCount = currentBoardState.GetHalfMoveCount() + 1;
+
+		if (move.pieceSource.type == Piece.Type.Pawn || move.pieceTarget.type != Piece.Type.None)
+		{
+			halfMoveCount = 0;
+		}
+
+		currentBoardState.SetHalfMoveCount(halfMoveCount);
 
 		// add the current zobristKey to the history
 
